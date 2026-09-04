@@ -1,0 +1,19 @@
+# 密钥与隐私（绝不提交）
+.env
+.env.*
+*.key
+*.pem
+service_role*.json
+supabase/.env*
+
+# 依赖（本项目零依赖，纯静态；如引入再调整）
+node_modules/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+*.log
+
+# 过程/临时文件（仅在开发目录，不进版本库）
+_work/
+*.tmp
