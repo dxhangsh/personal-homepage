@@ -97,6 +97,24 @@ h1.hero-line,
     drop-shadow(0 -1.5px 0 rgba(248,214,120,.95));
 }
 
+/* ---------- 建议 8 · 卡片外部落影（P1-8） ----------
+   为什么不能直接给 .card 加 shadow：.card 带 clip-path（V1 的 1% 内缩 +
+   js/v2-enhance.js 的凿边），而 clip-path 会裁掉元素「自身」画出的所有
+   filter 与 box-shadow 输出。实测给 .card 加 drop-shadow / box-shadow，
+   卡下方 0 像素变化（连 40px 偏移的纯红落影都不出现）；
+   同元素 overflow:visible 无效、clip-path:none 立刻显形，裁剪源即 clip-path。
+   故落影改由 js/v2-enhance.js 为每张卡生成的绝对定位空元素来画。
+   影分两层：3px 贴地影交代「接触」，14px 扩散影交代「悬浮」。 */
+.v2-cardshadow{
+  position:absolute;
+  z-index:-1;
+  pointer-events:none;
+  border-radius:4px;
+  box-shadow:
+    0 3px 6px rgba(0,0,0,.45),
+    0 14px 26px rgba(0,0,0,.5);
+}
+
 /* ---------- 建议 3 · 黄铜铆钉角标（Senawa 徽章 / Hogwarts 角徽） ---------- */
 .card::before{
   /* V1 的木纹层之上再叠铆钉：用多背景实现，避免新增 DOM */
