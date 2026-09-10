@@ -232,6 +232,24 @@ h1.hero-line,
 .footer-meta .fmid{color:var(--metal-b)}
 .scratch a{color:var(--ink-sub)}
 
+/* ---------- 建议 9 · 低透明度木刻纹样层（P1-9） ----------
+   素材：assets/textures/woodcut-motif.svg —— 自绘 240x56 无缝单元，
+   器物/工具简笔（锤 · 螺丝刀 · 齿轮 · 木工尺）+ 通幅木纹线。
+   刻法：同一组路径画两遍 —— 深色在「原位」、暖色偏移 (1,1)，形成
+   「凹槽 + 受光上沿」的雕刻断面，而不是单纯描一条线。
+   强度：两遍的 stroke-opacity 写死在 SVG 内（合计约 .08 量级），
+   正好落在建议的 opacity .05～.08；此处不再设 opacity，
+   否则会连带把页脚文字一起变淡。
+   落点：建议允许「页脚区或 Hero 底部」二选一，取页脚区 —— footer 只有
+   padding-top、无自有背景，改动最干净，且完全不触碰 Hero 的分层背景。
+   尺寸：平铺高 56px 与 footer 实际盒高接近，整幅纹样恰好落在这一横带上。 */
+footer{
+  background-image:url("../assets/textures/woodcut-motif.svg");
+  background-repeat:repeat;
+  background-size:240px 56px;
+  background-position:0 0;
+}
+
 /* ---------- 顶部导航的 V2 互切按钮 ---------- */
 .btn-nav.ghost{color:var(--card-ink)}
 
@@ -244,4 +262,159 @@ a:focus-visible, button:focus-visible{
 @media (max-width:720px){
   .footer-meta{gap:14px}
   .card{outline-offset:-4px}
+}
+
+/* ============================================================
+   V2 质感升级 · 第二阶段（Magic UI / Awwwards / CSS 滚动驱动）
+   新区块：里程碑数字 / 探索时间线 / 兴趣词带 / 滚动提示
+   动效：CSS scroll-driven animations（view() 时间线，零 JS）
+        + JS Number Ticker（带 @supports 检测，双保险）
+   ============================================================ */
+
+/* ---------- 滚动提示（首屏底部，Awwwards 通用 pattern） ---------- */
+.scroll-hint{
+  max-width:1120px; margin:6px auto 0; padding:0 22px;
+  display:flex; align-items:center; gap:10px;
+  color:var(--ink); font-size:12.5px; letter-spacing:.2em;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
+}
+.scroll-hint span{
+  width:22px; height:36px; border-radius:11px; flex:none;
+  border:1px solid rgba(255,235,190,.35);
+  position:relative;
+}
+.scroll-hint span::after{
+  content:""; position:absolute; left:50%; top:7px; width:3px; height:7px;
+  margin-left:-1.5px; border-radius:2px;
+  background:linear-gradient(180deg,var(--metal-a),var(--metal-c));
+  animation:wheelDrop 1.8s ease-in-out infinite;
+}
+@keyframes wheelDrop{
+  0%,100%{transform:translateY(0);opacity:1}
+  55%{transform:translateY(12px);opacity:.25}
+  70%{transform:translateY(12px);opacity:0}
+}
+.scroll-hint p{margin:0}
+
+/* ---------- 里程碑数字区块 ---------- */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px}
+.stat{text-align:center; padding:26px 18px 22px}
+.stat-num{
+  font-size:clamp(38px,4.6vw,52px); font-weight:800; line-height:1.1;
+  font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#f7e7b0,#dcb96a 55%,#a8813c);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(255,240,190,.28)) drop-shadow(0 2px 2px rgba(0,0,0,.35));
+}
+.stat-label{margin-top:6px; font-size:13.5px; color:var(--card-sub); letter-spacing:.06em}
+
+/* ---------- 探索时间线（黄铜刻度线随滚动生长） ---------- */
+.timeline{position:relative; padding:6px 0 4px}
+.tl-track{
+  position:absolute; left:26px; top:14px; bottom:14px; width:3px; border-radius:2px;
+  background:rgba(0,0,0,.38);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.5), 0 1px 0 rgba(255,220,160,.12);
+  overflow:hidden;
+}
+.tl-progress{
+  display:block; width:100%; height:100%;
+  background:linear-gradient(180deg,var(--metal-a),var(--metal-b) 55%,var(--metal-c));
+  transform:scaleY(0); transform-origin:top;
+}
+.tl-item{position:relative; margin:0 0 20px 64px; padding:20px 22px 18px}
+.tl-item:last-child{margin-bottom:0}
+/* 时间线卡片不参与随机凿边且不裁剪：clip-path 与 overflow:hidden 都会把压线的 .tl-dot 裁掉（CDP 实测确诊） */
+.tl-item.card{clip-path:none !important; border-radius:5px; overflow:visible !important}
+.tl-dot{
+  position:absolute; left:-43px; top:26px; width:17px; height:17px; border-radius:50%; z-index:2;
+  background:radial-gradient(circle at 34% 30%,#fff7d8,#e8c878 42%,#9a7838 85%);
+  box-shadow:0 0 0 3px rgba(50,28,10,.75), 0 2px 5px rgba(0,0,0,.55), inset 0 -1px 1px rgba(0,0,0,.35);
+}
+.tl-dot::after{ /* 外环增强「穿在线上」的连接感 */
+  content:""; position:absolute; inset:-6px; border-radius:50%;
+  border:1.5px solid rgba(232,200,120,.7);
+}
+.tl-year{
+  display:inline-block; font-size:12px; font-weight:800; letter-spacing:.22em;
+  color:var(--metal-ink); padding:3px 10px; border-radius:4px; margin-bottom:8px;
+  background:linear-gradient(180deg,var(--metal-a),var(--metal-b));
+  border:1px solid rgba(0,0,0,.3); border-top-color:rgba(255,255,255,.55);
+  box-shadow:2px 3px 6px -3px rgba(0,0,0,.5);
+}
+.tl-item h3{font-size:17px; margin:0 0 6px}
+.tl-item p{font-size:14px; margin:0; color:var(--card-sub); filter:contrast(1.15)}
+
+/* ---------- 兴趣词带（Magic UI Marquee：双向无限滚动） ---------- */
+.marquee-band{
+  margin:26px 0 0; padding:14px 0;
+  border-top:1px solid rgba(0,0,0,.45);
+  box-shadow:0 1px 0 rgba(255,220,160,.14) inset;
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);
+}
+.marquee{display:flex; width:max-content}
+.marquee-inner{
+  display:flex; align-items:center; gap:14px; padding-right:14px;
+  animation:marqueeMove 26s linear infinite;
+}
+.marquee:hover .marquee-inner{animation-play-state:paused}
+.marquee-inner span{
+  flex:none; padding:8px 18px; border-radius:999px; white-space:nowrap;
+  font-size:13.5px; letter-spacing:.1em; color:var(--ink-sub);
+  background:rgba(0,0,0,.28);
+  border:1px solid rgba(255,220,160,.22);
+}
+.marquee-inner span:first-child{color:var(--metal-b)}
+@keyframes marqueeMove{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+
+/* ---------- 滚动驱动动画（2026 基线 API，@supports 包裹防旧浏览器） ---------- */
+@supports (animation-timeline: view()){
+  /* 卡片/时间线项：进入视口时浮起（Magic UI Blur Fade 的 CSS 原生版） */
+  .reveal{
+    animation:revealUp .8s cubic-bezier(.2,.7,.3,1) both;
+    animation-timeline:view();
+    animation-range:entry 0% entry 62%;
+  }
+  @keyframes revealUp{
+    from{opacity:0; transform:translateY(34px) scale(.985)}
+    to{opacity:1; transform:translateY(0) scale(1)}
+  }
+  /* 时间线黄铜线：随滚动生长（Awwwards scrollytelling 手法） */
+  .tl-progress{
+    animation:tlGrow linear both;
+    animation-timeline:view();
+    animation-range:entry 0% exit 80%;
+  }
+  @keyframes tlGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  /* 背景木纹视差（与前景不同速，营造纵深） */
+  body{
+    animation:woodParallax linear both;
+    animation-timeline:scroll(root);
+    animation-range:0% 100%;
+  }
+  @keyframes woodParallax{
+    from{background-position:0 0, 0 0, 0 0, 0 0, 0 0}
+    to{background-position:0 -60px, 0 -110px, 0 0, 0 0, 0 0}
+  }
+}
+/* 无滚动驱动支持时的回退：直接可见（无动画但不隐藏内容） */
+
+/* ---------- 减少动态偏好 ---------- */
+@media (prefers-reduced-motion: reduce){
+  .marquee-inner{animation:none}
+  .scroll-hint span::after{animation:none}
+  .reveal{animation:none !important}
+  body{animation:none !important}
+  .btn,.totop{transition:none}
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:720px){
+  .scroll-hint{padding:0 14px}
+  .tl-item{margin-left:52px}
+  .tl-track{left:20px}
+  .tl-dot{left:-38px}
+  .marquee-inner{gap:10px; padding-right:10px}
 }

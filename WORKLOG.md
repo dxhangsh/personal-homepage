@@ -146,6 +146,24 @@ personal-homepage/
 - **V1 回归**：`index.html` 实测不受影响（14/14 凿边、无 V2 样式引用、邮箱/头像/木纹全部正常）。
 - **资源体积**：新增三文件均 <64KB（7669 / 6507 / 559B），满足服务器约束。
 
+### 步骤 4：V2 质感升级——新区块与滚动叙事（2026-09-10）
+- **依据**：多平台调研（Magic UI 组件清单 / Awwwards scrollytelling 与视差趋势 / Land-book 落地页布局 / CodePen 滚动动画 pattern / CSS 滚动驱动动画 2026 基线）。
+- **新增界面区块**（内容全部可核验，不虚构）：
+  1. `#milestones` 成长的刻度——4 张数字卡（拆解设备 2+ / 独立改造 1 / 出生 2007 / 方向 3），JS Number Ticker 进入视口递增（easeOutCubic，1.4s）。
+  2. `#timeline` 探索的时间线——4 节点生平刻度（2007 / 童年—初中 / 高中 / 未来），左侧黄铜刻度线随滚动生长（scaleY 0→1，view() 时间线）。
+  3. 兴趣词带——9 个兴趣胶囊双向无限滚动（Marquee 手法，两端渐隐遮罩，hover 暂停）。
+  4. 首屏滚动提示——鼠标轮廓+下滑滑块动画（wheelDrop）。
+- **滚动动效（零依赖）**：
+  - `.reveal` 全站卡片进入视口浮起：CSS `animation-timeline: view()`（Blur Fade 原生版），`@supports` 包裹防旧浏览器。
+  - 背景木纹双层视差（`scroll(root)` 时间线，520/390 两层不同速）。
+  - `prefers-reduced-motion` 全量降级；无 `view()` 支持时内容直接可见。
+- **踩坑记录（重要）**：
+  1. **`.tl-dot` 被裁掉（两段式根因）**：先怀疑 `.card` 凿边 `clip-path`，移除后红点测试仍不可见；再用 CDP `elementFromPoint` + 红点高亮二分定位，确认真凶是 V1 `.card` 的 **`overflow:hidden`**——`left:-45px` 伸出卡片左缘的圆点被整颗裁掉。修复：`.tl-item.card{clip-path:none; overflow:visible}`，时间线用平直木牌（叙事上也更合理）。**教训：`getBoundingClientRect` 返回裁剪前几何值，判断"看不见"必须做像素级或 hit-test 验证。**
+  2. 编辑 hero 插入滚动提示时 old_str 匹配不完整，`hero-cta` 段落被意外复制 → 目检发现重复按钮组，已删除。
+  3. 时间线圆点与卡片铆钉视觉混淆 → 圆点放大至 17px 并加深色底环+金色外环，明确区分。
+- **验收**：CDP 实测（`cdp_verify_v2b.js`）全绿——cssScrollAnim=true、revealUp/marqueeMove/tlGrow/woodParallax 四动画生效、词带 2 份、时间线 4 节点、数字递增至 2+/1/2007/3、无控制台报错；V1 回归无损；截图目检通过（时间线 4 节点压线确认、词带渐隐对称、滚动提示可读）。
+- **资源体积**：11242 / 19513 / 1749B，均 <64KB。
+
 ---
 
 ### 步骤 3：同类调性参考站检索与 V2 优化建议（2026-09-10）
