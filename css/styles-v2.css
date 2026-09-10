@@ -11,15 +11,36 @@
    ============================================================ */
 
 /* ---------- 建议 8 · 页面暗角加深（Grounded vignette） ---------- */
+/* 【P0-3 修复】原先本覆盖层与 V1 都把不透明木纹排在两个 radial 之前；
+   CSS 靠前图层在最上方，木纹整块盖住暖光与暗角，属「写了但完全不渲染」的死层
+   （本文件首版仅把 alpha 由 .14/.34 调到 .16/.5，同样无效）。
+   修法：把两个 radial 提到木纹之前，并按新顺序重排 background-size。 */
 body{
   background-image:
-    var(--line-a), var(--line-b),
-    radial-gradient(1200px 760px at 12% 4%, rgba(255,224,176,.16), transparent 55%),
+    radial-gradient(1700px 1500px at 12% 0%, rgba(255,230,190,.28), rgba(255,230,190,.06) 45%, transparent 72%),
     radial-gradient(1100px 950px at 92% 102%, rgba(0,0,0,.5), transparent 62%),
+    var(--line-a), var(--line-b),
     linear-gradient(165deg, var(--body-a), var(--body-b) 55%, var(--body-c));
+  background-size:auto, auto, 520px 520px, 390px 390px, auto;
+}
+
+/* ---------- 建议 6 · 橡木色板降饱和去干橙（P0-2，走 :root 覆盖，不动 V1 文件） ---------- */
+/* 干橙感来自 S≈43%；在明度不变的前提下把 S 压到 ≈33%（色相 37°→40°） */
+:root{
+  --oak-base:#bda77c; --oak-hi:#ccbc94; --oak-lo:#ab9164;
+  --serif:Georgia,"Songti SC","Noto Serif SC","Source Han Serif SC",SimSun,"Times New Roman",serif;
+}
+html[data-theme="light"]{
+  --oak-base:#c8b286; --oak-hi:#d6c69c; --oak-lo:#b39b6d;
 }
 
 /* ---------- 建议 1 · 黄铜烫印标题（Palmo 冲压字 / Senawa wordmark） ---------- */
+/* P0-1 × 建议 1 合并：以衬线字体承载黄铜渐变，书卷气 + 金属质感 */
+h1.hero-line,
+.section-title h2,
+.card h3{
+  font-family:var(--serif);
+}
 h1.hero-line,
 .section-title h2{
   background:linear-gradient(180deg, #f7e7b0, #dcb96a 55%, #a8813c);
@@ -123,12 +144,16 @@ h1.hero-line,
 .avatar img{border-radius:4px}
 
 /* 目检修复：标题孤字换行——「年」字独占一行。
-   方案：hero 标题字号上限从 54px 收到 50px（clamp 上限），
-   第二行「一名立志投身脑机接口前沿工科的少年」在 1120px 容器内可整行放下； */
+   衬线字面比无衬线宽，故按实测重定字号：1280 视口下 hero-body 可用宽 ≈874px，
+   第二行 17 字 × (字号 − 1px 字距)，实测 52px 仍为单行、53px 起断行。
+   故桌面档取 52px（@media ≥1164px 时 .wrap 已封顶 1120px，可用宽恒定）；
+   窄屏退回 4vw，保证整行放下。text-wrap:balance 作为移动端孤字的兜底。 */
 .hero-line{
-  font-size:clamp(30px,5vw,50px);
+  font-size:clamp(28px,4vw,50px);
   width:100%;
+  text-wrap:balance;
 }
+@media (min-width:1164px){ .hero-line{ font-size:52px } }
 .hero{align-items:center}
 .hero-body{min-width:0}
 
