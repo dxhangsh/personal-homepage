@@ -22,7 +22,7 @@
     started: false,
     config: {
       darkness: 0.98,        // 初始黑暗不透明度（0.965 ≈ 全黑但保留 3.5% 轮廓）
-      memoryAlpha: 0.42,      // 探索记忆冲孔强度（走过区域变「稍暗但可见」）
+      memoryAlpha: 0.34,      // 探索记忆冲孔强度（走过区域变「稍暗但可见」）
       torchRadius: 230,       // 火把基准照亮半径 px
       torchCoreAlpha: 0.93,   // 火把中心最亮冲孔强度
       breatheAmp: 0.085,      // 呼吸幅度（半径 ±8.5%）
@@ -120,7 +120,7 @@
       if(d > 6){
         this.px = e.clientX; this.py = e.clientY;
         this.stamp(e.clientX + window.scrollX, e.clientY + window.scrollY,
-                   CaveLight.config.torchRadius*0.45, CaveLight.config.memoryAlpha);
+                   CaveLight.config.torchRadius*0.75, CaveLight.config.memoryAlpha);
       }
       // 火星：移动越快喷发越多
       var n = Math.random() < CaveLight.config.sparkRate + this.speed*0.012 ? 1 : 0;
