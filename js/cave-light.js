@@ -57,12 +57,14 @@
       this.started = true; CaveLight.started = true;
       var self = this;
 
-      // 记忆层
+      // 记忆层：文档坐标系全页画布（不显示，仅存储探索痕迹）
+      this.docH = Math.max(document.documentElement.scrollHeight, innerHeight);
       this.mem = document.createElement('canvas');
-      this.mem.width = innerWidth; this.mem.height = innerHeight;
+      this.mem.width = document.documentElement.scrollWidth || innerWidth;
+      this.mem.height = this.docH;
       this.memCtx = this.mem.getContext('2d');
 
-      // 黑暗层（盖在内容上，指针穿透）
+      // 黑暗层：视口大小、fixed；每帧按当前滚动位置从记忆层合成
       this.dark = document.createElement('canvas');
       this.dark.id = 'caveDark';
       this.dark.width = innerWidth; this.dark.height = innerHeight;
@@ -83,16 +85,28 @@
       window.addEventListener('pointermove', function(e){ self.onMove(e); }, {passive:true});
       window.addEventListener('pointerdown', function(e){ self.burst(e.clientX, e.clientY, 14); }, {passive:true});
 
-      // 初始把视口中心也作为「火把落点」，避免首帧无从看清
-      this.stamp(this.mx, this.my, CaveLight.config.torchRadius*0.9, CaveLight.config.memoryAlpha*0.5);
+      // 初始把视口中心也作为「火把落点」（文档坐标），避免首帧无从看清
+      this.stamp(this.mx + window.scrollX, this.my + window.scrollY,
+                 CaveLight.config.torchRadius*0.9, CaveLight.config.memoryAlpha*0.5);
       this.loop();
       CaveLight.emit('ready');
     },
 
     resize: function(){
-      [this.mem, this.dark].forEach(function(c){
-        c.width = innerWidth; c.height = innerHeight;
-      });
+      // 黑暗层跟随视口
+      this.dark.width = innerWidth; this.dark.height = innerHeight;
+      // 记忆层随文档高度增长（保留旧痕迹：拷贝到新画布）
+      var newH = Math.max(document.documentElement.scrollHeight, innerHeight);
+      var newW = document.documentElement.scrollWidth || innerWidth;
+      if(newH > this.mem.height || newW > this.mem.width){
+        var old = this.mem;
+        this.mem = document.createElement('canvas');
+        this.mem.width = Math.max(newW, old.width);
+        this.mem.height = Math.max(newH, old.height);
+        this.memCtx = this.mem.getContext('2d');
+        this.memCtx.drawImage(old, 0, 0);
+      }
+      this.docH = newH;
     },
 
     onMove: function(e){
@@ -101,11 +115,12 @@
       if(!this.running) return;
       var dx = e.clientX-this.px, dy = e.clientY-this.py;
       this.speed = Math.min(Math.sqrt(dx*dx+dy*dy), 60);
-      // 探索记忆：随移动持续盖印（间隔距离阀值防过密）
+      // 探索记忆：随移动持续盖印（文档坐标，滚动后痕迹仍对准页面位置）
       var d = Math.sqrt(dx*dx+dy*dy);
       if(d > 6){
         this.px = e.clientX; this.py = e.clientY;
-        this.stamp(e.clientX, e.clientY, CaveLight.config.torchRadius*0.45, CaveLight.config.memoryAlpha);
+        this.stamp(e.clientX + window.scrollX, e.clientY + window.scrollY,
+                   CaveLight.config.torchRadius*0.45, CaveLight.config.memoryAlpha);
       }
       // 火星：移动越快喷发越多
       var n = Math.random() < CaveLight.config.sparkRate + this.speed*0.012 ? 1 : 0;
@@ -147,16 +162,17 @@
         var R = cfg.torchRadius * (1 + breathe + flick);
         var dctx = self.darkCtx;
 
-        // 1) 全黑暗底
+        // 1) 全黑暗底（仅视口）
         dctx.globalCompositeOperation = 'source-over';
         dctx.clearRect(0,0,self.dark.width,self.dark.height);
         dctx.fillStyle = 'rgba(6,4,2,'+cfg.darkness+')';
         dctx.fillRect(0,0,self.dark.width,self.dark.height);
 
-        // 2) 探索记忆冲孔（走过 → 永久「稍暗但可见」：冲孔强度恒为 memoryAlpha，路径重叠不增亮）
+        // 2) 探索记忆冲孔：记忆层是文档坐标，按当前滚动偏移对齐视口
+        //    （走到页面深处，黑暗与痕迹同步滚动——整页皆洞窟）
         dctx.globalCompositeOperation = 'destination-out';
         dctx.globalAlpha = cfg.memoryAlpha;
-        dctx.drawImage(self.mem, 0, 0);
+        dctx.drawImage(self.mem, -window.scrollX, -window.scrollY);
         dctx.globalAlpha = 1;
 
         // 3) 火把当前最亮区冲孔
@@ -170,7 +186,7 @@
 
         // 4) 火光暖色叠加（只在当前照亮区，营造火把色温）
         dctx.globalCompositeOperation = 'source-over';
-        var w = dctx.createRadialGradient(self.mx, self.my, 0, self.mx, self.my, R*0.85);
+        var w = dctx.createRadialGradient(self.mx, self.my, 0, self.mx, self.my, R*0.6);
         w.addColorStop(0, 'rgba('+cfg.warm+',0.14)');
         w.addColorStop(0.6, 'rgba('+cfg.warm+',0.05)');
         w.addColorStop(1, 'rgba('+cfg.warm+',0)');
