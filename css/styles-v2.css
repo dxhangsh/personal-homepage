@@ -15,13 +15,22 @@
    CSS 靠前图层在最上方，木纹整块盖住暖光与暗角，属「写了但完全不渲染」的死层
    （本文件首版仅把 alpha 由 .14/.34 调到 .16/.5，同样无效）。
    修法：把两个 radial 提到木纹之前，并按新顺序重排 background-size。 */
+/* 【暗角锚定修复】V1 与本文件首版都给两个 radial 用了 background-size:auto，
+   radial 的自身尺寸即定位区，故其定位区等于 body 全高（页高 2271px）——
+   at 92% 102% 的圆心被算到 y≈2316（页面最底部），前 ~1800px 完全够不到，
+   实测右下 1250,880 的 V2/V1 亮度差为 0，等于没生效。
+   修法：只把暗角层改为随视口锚定（background-attachment:fixed + 100vw 100vh），
+   暖光层维持页面锚定（scroll），以保住已验收的「上亮下暗」纵深层次。 */
 body{
   background-image:
     radial-gradient(1700px 1500px at 12% 0%, rgba(255,230,190,.28), rgba(255,230,190,.06) 45%, transparent 72%),
     radial-gradient(1100px 950px at 92% 102%, rgba(0,0,0,.5), transparent 62%),
     var(--line-a), var(--line-b),
     linear-gradient(165deg, var(--body-a), var(--body-b) 55%, var(--body-c));
-  background-size:auto, auto, 520px 520px, 390px 390px, auto;
+  background-size:auto, 100vw 100vh, 520px 520px, 390px 390px, auto;
+  /* 仅暗角层不重复（尺寸已等于视口，repeat 只会带来边缘多铺一块的不确定性） */
+  background-repeat:repeat, no-repeat, repeat, repeat, repeat;
+  background-attachment:scroll, fixed, scroll, scroll, scroll;
 }
 
 /* ---------- 建议 6 · 橡木色板降饱和去干橙（P0-2，走 :root 覆盖，不动 V1 文件） ---------- */
