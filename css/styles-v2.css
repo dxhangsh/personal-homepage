@@ -161,6 +161,35 @@ h1.hero-line,
 }
 .avatar img{border-radius:4px}
 
+/* ---------- 建议 7 · chip 改「金属铭牌」（P1-7） ---------- */
+/* V1 的 chip 是「小木牌」：橡木渐变 + 棕色字，和卡片同材质，浮不起来。
+   这里改成黄铜铭牌：更方的圆角、金属倒角边（上/左亮、下/右暗）、
+   斜向高光带模拟抛光反光、文字用「下亮上暗」双阴影做出冲压刻字感。
+   分两档保留原有层级：普通 chip = 旧化黄铜，.chip.gold = 抛光黄铜（更亮）。
+   注意：V1 的 .chip.gold 特异性是 (0,2,0)，所以共享规则必须写 `.chip, .chip.gold`
+   才能以同等特异性靠文件顺序压过它 —— 只写 .chip 的话 gold 档会保留旧的边框与投影。 */
+.chip, .chip.gold{
+  border-radius:4px;
+  color:var(--metal-ink);
+  border:1px solid rgba(0,0,0,.42);
+  border-top-color:rgba(255,255,255,.6);
+  border-left-color:rgba(255,255,255,.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 -1px 1px rgba(0,0,0,.32),
+    4px 5px 11px -8px rgba(0,0,0,.7);
+  text-shadow:0 1px 0 rgba(255,255,255,.5);
+  background-image:
+    linear-gradient(115deg, rgba(255,255,255,0) 0 40%, rgba(255,255,255,.2) 50%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--metal-b), var(--metal-c) 58%, #a8813c);
+}
+.chip.gold{
+  background-image:
+    linear-gradient(115deg, rgba(255,255,255,0) 0 40%, rgba(255,255,255,.28) 50%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, #fdf2c8, var(--metal-a) 46%, var(--metal-c));
+  text-shadow:0 1px 0 rgba(255,255,255,.62);
+}
+
 /* 目检修复：标题孤字换行——「年」字独占一行。
    衬线字面比无衬线宽，故按实测重定字号：1280 视口下 hero-body 可用宽 ≈874px，
    第二行 17 字 × (字号 − 1px 字距)，实测 52px 仍为单行、53px 起断行。
