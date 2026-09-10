@@ -71,4 +71,18 @@
     });
   },{rootMargin:'-45% 0px -50% 0px'});
   sections.forEach(function(s){ if(s.id) observer.observe(s); });
+
+  /* ---------- 6. 联系邮箱（防爬混淆：反转分片，运行时拼装，源码不留明文） ---------- */
+  var mailShow=document.getElementById('mailShow');
+  var mailBtn=document.getElementById('mailBtn');
+  if(mailShow || mailBtn){
+    var rv=function(s){ return s.split('').reverse().join(''); };
+    var user=rv('emb_000515_nehc');   // 反转还原：账号
+    var domain=rv('nc.ude.ujt');      // 反转还原：域名
+    var addr=user+String.fromCharCode(64)+domain;
+    if(mailShow){ mailShow.textContent='邮箱：'+user+' [at] '+domain; }
+    if(mailBtn){
+      mailBtn.setAttribute('href','mailto:'+addr+'?subject='+encodeURIComponent('来自个人主页的留言'));
+    }
+  }
 })();
