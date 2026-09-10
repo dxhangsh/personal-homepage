@@ -473,3 +473,61 @@ body{
 .btn,.chip.gold,.brand-mark,.tl-year,.totop,.ic,.meter span{
   background:linear-gradient(180deg,#e2c584,#d0ac68 52%,#b3904f);
 }
+
+/* ============================================================
+   V2 · 洞窟探索光效（cave-light 配套样式）
+   ============================================================ */
+
+/* ---------- 火把光标 ---------- */
+.cave-mode, .cave-mode a, .cave-mode button{ cursor:none }
+#caveTorch{
+  position:fixed; left:0; top:0; z-index:9991; pointer-events:none;
+  width:0; height:0; will-change:transform;
+}
+.cv-stick{
+  position:absolute; left:-3px; top:-6px; width:6px; height:26px;
+  border-radius:3px; transform:rotate(24deg); transform-origin:top center;
+  background:linear-gradient(90deg,#5a3a1a,#8a5c2c 45%,#3c2410);
+  box-shadow:0 1px 3px rgba(0,0,0,.6);
+}
+.cv-flame{
+  position:absolute; left:-11px; top:-40px; width:22px; height:34px;
+  transform-origin:50% 100%;
+  animation:cvFlicker 0.28s ease-in-out infinite alternate;
+}
+.cv-flame i{
+  position:absolute; border-radius:50% 50% 45% 45%;
+}
+.cv-flame i:nth-child(1){ /* 外焰 */
+  inset:0; background:radial-gradient(ellipse at 50% 82%, rgba(255,236,170,.95), rgba(255,140,40,.85) 55%, rgba(200,60,10,.15) 85%, transparent);
+  filter:blur(0.6px);
+}
+.cv-flame i:nth-child(2){ /* 内焰 */
+  inset:8px 5px 4px; background:radial-gradient(ellipse at 50% 80%, rgba(255,255,225,.98), rgba(255,190,80,.75) 70%, transparent);
+}
+.cv-flame i:nth-child(3){ /* 焰心 */
+  left:8px; right:8px; bottom:5px; top:18px; border-radius:50%;
+  background:radial-gradient(circle at 50% 70%, #fffdf0, rgba(255,240,180,.6) 70%, transparent);
+}
+@keyframes cvFlicker{
+  0%{ transform:scale(var(--breathe,1)) rotate(-2.5deg) }
+  100%{ transform:scale(calc(var(--breathe,1) * 1.08)) rotate(2.5deg) }
+}
+.cv-halo{ /* 火焰周围的柔光晕 */
+  position:absolute; left:-42px; top:-70px; width:84px; height:84px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,170,70,.28), rgba(255,120,40,.10) 55%, transparent 75%);
+  animation:cvHalo 1.8s ease-in-out infinite alternate;
+}
+@keyframes cvHalo{
+  from{opacity:.75; transform:scale(.94)}
+  to{opacity:1; transform:scale(1.1)}
+}
+
+/* ---------- 触屏/键盘回退：不隐藏光标也能用 ---------- */
+@media (pointer:coarse){
+  .cave-mode, .cave-mode a, .cave-mode button{ cursor:auto }
+  #caveTorch{ display:none }
+}
+@media (prefers-reduced-motion: reduce){
+  .cv-flame, .cv-halo{ animation:none }
+}
