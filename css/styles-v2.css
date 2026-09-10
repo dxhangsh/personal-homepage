@@ -418,3 +418,58 @@ a:focus-visible, button:focus-visible{
   .tl-dot{left:-38px}
   .marquee-inner{gap:10px; padding-right:10px}
 }
+
+/* ============================================================
+   V2 质感升级 · 第三阶段：柔和提亮主题
+   背景/卡片色调提亮变温和；黑金（深棕）文字统一改浅色
+   方式：重定义 V1 主题变量（仅 v2-preview.html 加载本文件，不影响 V1）
+   ============================================================ */
+
+:root{
+  /* 胡桃木背景整体提亮一档、降低对比（更温和） */
+  --body-a:#6b4b2b; --body-b:#7f5d3a; --body-c:#5a3d22;
+
+  /* 橡木卡片提亮 */
+  --oak-base:#d3b687; --oak-hi:#e4cda3; --oak-lo:#c2a26f;
+
+  /* 卡片文字：深棕 → 浅象牙（黑金文字统一改浅） */
+  --card-ink:#fff7e4; --card-sub:#f5ead0; --card-dim:#e9dab9;
+
+  /* 黄铜上的深色字 → 浅色（按钮/chip/徽章/年份牌统一） */
+  --metal-ink:#fff7e4;
+
+  /* 深底文字同步提亮 */
+  --ink:#f8ecd4; --ink-sub:#e6d2ab; --ink-dim:#cbb086;
+}
+
+/* 浅色文字的可读性辅助：细描影代替高对比深色 */
+.card h3,.card p,.stat-label,.tl-item h3,.tl-item p,.contact-info p,.scratch{
+  text-shadow:0 1px 2px rgba(96,62,26,.55), 0 0 1px rgba(96,62,26,.35);
+}
+.btn,.chip.gold,.brand-mark,.tl-year,.totop,.nav-menu a.active{
+  color:var(--metal-ink);
+  text-shadow:0 1px 2px rgba(96,62,26,.6), 0 0 1px rgba(96,62,26,.4);
+}
+.chip{color:var(--card-sub); text-shadow:0 1px 2px rgba(96,62,26,.5)}
+
+/* 烫印标题/大数字在提亮卡片上加对比环（浅金文字的衬底） */
+h1.hero-line,.stat-num{
+  filter:drop-shadow(0 1px 0 rgba(255,245,215,.4)) drop-shadow(0 2px 3px rgba(96,62,26,.55));
+}
+/* kicker 与 stat-label 小字加深一档底色感知 */
+.kicker{color:#f3ddad}
+.stat-label{color:var(--card-sub)}
+
+/* 暗角随之减弱（背景提亮后黑角过重会显脏） */
+body{
+  background-image:
+    var(--line-a), var(--line-b),
+    radial-gradient(1200px 760px at 12% 4%, rgba(255,228,180,.18), transparent 55%),
+    radial-gradient(1100px 950px at 92% 102%, rgba(0,0,0,.34), transparent 62%),
+    linear-gradient(165deg, var(--body-a), var(--body-b) 55%, var(--body-c));
+}
+
+/* 黄铜微调：略深半档，保证浅色字在按钮上可读 */
+.btn,.chip.gold,.brand-mark,.tl-year,.totop,.ic,.meter span{
+  background:linear-gradient(180deg,#e2c584,#d0ac68 52%,#b3904f);
+}
