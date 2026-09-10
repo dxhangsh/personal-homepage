@@ -43,6 +43,15 @@ html[data-theme="light"]{
   --oak-base:#c8b286; --oak-hi:#d6c69c; --oak-lo:#b39b6d;
 }
 
+/* ---------- 建议 6 · 放大留白（P1-6） ---------- */
+/* V1 原值：.grid{gap:20px}  .card{padding:26px}  .section-title{margin:38px 0 16px}
+   密度偏紧、卡片略显局促。放宽到 26 / 30 / 52px，木纹与金边的呼吸感更好。
+   注意：这里只写 margin-top —— 建议 11 已把 .section-title 的 margin-bottom 改成 22px，
+   若用 margin 简写会把 22px 冲回 16px，刻痕分割线与标题的贴合会变松。 */
+.grid{gap:26px}
+.card{padding:30px}
+.section-title{margin-top:52px}
+
 /* ---------- 建议 1 · 黄铜烫印标题（Palmo 冲压字 / Senawa wordmark） ---------- */
 /* P0-1 × 建议 1 合并：以衬线字体承载黄铜渐变，书卷气 + 金属质感 */
 h1.hero-line,
