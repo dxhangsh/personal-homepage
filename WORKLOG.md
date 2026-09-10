@@ -132,6 +132,20 @@ personal-homepage/
 - 隐私：仅保留方向性描述（如「受母亲熏陶」），**不含**父母职业细节与第三方姓名。
 - 联系：✅ 已落地 —— 邮箱 `chen_515000_bme@tju.edu.cn`，采用 JS 防爬混淆（源码以**反转分片**存储，运行时拼装；页面显示 `chen_515000_bme [at] tju.edu.cn`，按钮为 `mailto:` 并带主题）。验收：`index.html`/`main.js` 中**无明文邮箱**；按钮 `href` 与显示文本运行时拼装正确、无报错。
 
+### 步骤 3：V2 视觉增强预览版上线（与 V1 共存）（2026-09-10）
+- **依据**：`output/tasks` 交付的《v2 视觉调研》（68design.net/cool 第 1–2 页 60 站初筛 + 7 站精选：senawastudio / palmo / khanhnguyen / grounded2026 / hogwartsstory / 360lexingtonave / nbnzia）。
+- **共存方式（不改动任何 V1 文件）**：
+  - 新增 `v2-preview.html`（7669B）：结构与 `index.html` 同构，标题/chips/页脚标注 V2 预览，导航加「返回 V1 正式版」互切按钮，页脚加 meta 三段式（汕头 · 2026 在读 · BCI）。
+  - 新增 `css/styles-v2.css`（6507B）：叠加覆盖层实现 9 项增强 —— ①烫印标题（`background-clip:text`）②卡片暖光灯槽（双层 inset 暖光）③铆钉角标（`::before` 多背景，无新增 DOM）④金线勾边（四向 `drop-shadow`，沿凿边轮廓完整生成）⑤按钮按压质感（hover 磨亮 / active 下沉+inset 阴影）⑧暗角加深（.34→.50）⑩meta 页脚 ⑪刻痕分割线（上暗下亮双线）⑫头像橡木镶框（6px 框+内阴影 vignette）。
+  - 新增 `js/v2-enhance.js`（559B）：占位脚本，标记 `window.__V2_PREVIEW__`。
+- **踩坑记录（重要）**：
+  1. `background` **简写**会重置 `background-clip:text` 为 `border-box`，章节标题渲染成实心金块、文字不可见 —— 改用 `background-image` 修复。
+  2. 金线用 `outline` 会被凿边 `clip-path` 切断（边中切深可达 3.5% 宽度）—— 改用四向 `drop-shadow`（跟随凿边实际轮廓）+ `.95` 不透明度后目检达标。
+  3. hero 标题 54px 上限在 1120px 容器产生「年」孤字换行 —— clamp 上限收到 50px 修复。
+- **验收（CDP 实测 `cdp_verify_v2.js`，17 项全绿）**：标题/卡片/导航/区块结构完整；`styles-v2.css` 与 `__V2_PREVIEW__` 已加载；h1 `background-clip:text` 生效；卡片暖光（255,180,90）命中；铆钉 2 颗；头像镶框 6px；meta 页脚 3 段；头像 400 加载；`mailto:` 拼装正确；互切按钮存在；无控制台报错。截图目检（首屏 + 放大）：烫印标题清晰、无孤字换行、金边连续、铆钉立体、「关于我」可读。
+- **V1 回归**：`index.html` 实测不受影响（14/14 凿边、无 V2 样式引用、邮箱/头像/木纹全部正常）。
+- **资源体积**：新增三文件均 <64KB（7669 / 6507 / 559B），满足服务器约束。
+
 ---
 
 ### 步骤 3：同类调性参考站检索与 V2 优化建议（2026-09-10）
