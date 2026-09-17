@@ -62,7 +62,17 @@
       if(this.started) return;
       this.started = true; CaveLight.started = true;
       var self = this;
+      // mx/my = 火把当前渲染位置（缓动）；tx/ty = 光标目标位置
+      // 点燃瞬间 mx/my 位于引子木棍处（顶部），随后平滑滑行到光标，避免"瞬移回下面"
       if(typeof x==='number' && typeof y==='number'){ this.mx = x; this.my = y; }
+      this.tx = this.mx; this.ty = this.my;   // 光照目标也从顶部起步（与火把一致）
+      this.px = this.mx; this.py = this.my;   // 速度基准同步，避免首帧速度虚高
+      this.handoff = true;      // 首次交接：用更慢的缓动做可见滑行
+      this.moved = false;       // 用户是否已真正移动过光标
+      this.handoffT = 0;        // 交接起点时间戳
+      this.follow = 0.06;       // 交接期跟随系数（配合 700ms 定时窗口，约 93% 位移完成）
+      this.handoffDur = 700;    // 交接滑行时长（ms），到期切回常规跟随
+      this.followNormal = 0.3;  // 常规跟随系数（约 0.1s 到位，接近原生光标手感）
 
       // 记忆层：文档坐标系全页画布（不显示，仅存储探索痕迹）
       this.docH = Math.max(document.documentElement.scrollHeight, innerHeight);
@@ -119,21 +129,27 @@
     },
 
     onMove: function(e){
-      this.mx = e.clientX; this.my = e.clientY;
-      this.torch.style.transform = 'translate('+(e.clientX)+'px,'+(e.clientY)+'px)';
+      // 只记录目标位置；实际渲染位置由 loop() 缓动追随（避免瞬移）
+      this.tx = e.clientX; this.ty = e.clientY;
+      this.moved = true;
       if(!this.running) return;
+      var dx0 = e.clientX - this.mx, dy0 = e.clientY - this.my;
+      if(this.handoff && Math.sqrt(dx0*dx0+dy0*dy0) > 2){
+        // 交接滑行尚未结束：不盖印、不喷火星，保持"火把从木棍处飘来"的观感
+        return;
+      }
       var dx = e.clientX-this.px, dy = e.clientY-this.py;
       this.speed = Math.min(Math.sqrt(dx*dx+dy*dy), 60);
       // 探索记忆：随移动持续盖印（文档坐标，滚动后痕迹仍对准页面位置）
       var d = Math.sqrt(dx*dx+dy*dy);
       if(d > 6){
         this.px = e.clientX; this.py = e.clientY;
-        this.stamp(e.clientX + window.scrollX, e.clientY + window.scrollY,
+        this.stamp(this.mx + window.scrollX, this.my + window.scrollY,
                    CaveLight.config.torchRadius*0.75, CaveLight.config.memoryAlpha);
       }
       // 火星：移动越快喷发越多
       var n = Math.random() < CaveLight.config.sparkRate + this.speed*0.012 ? 1 : 0;
-      if(n && !reduced) this.spawnSpark(e.clientX, e.clientY);
+      if(n && !reduced) this.spawnSpark(this.mx, this.my);
     },
 
     stamp: function(x, y, r, alpha){
@@ -165,6 +181,18 @@
       function frame(now){
         var cfg = CaveLight.config;
         var t = (now - self.t0)/1000;
+
+        // 火把位置缓动追随：交接期慢（可见滑行），到位后切换常规跟随
+        var fdx = self.tx - self.mx, fdy = self.ty - self.my;
+        // 交接滑行：自用户首次移动起计时，到期切回常规跟手（指数缓动渐近，不能用距离阈值收尾）
+        if(self.handoff && self.moved){
+          if(!self.handoffT) self.handoffT = now;
+          if(now - self.handoffT > self.handoffDur) self.handoff = false;
+        }
+        var k = self.handoff ? self.follow : self.followNormal;
+        self.mx += fdx * k;
+        self.my += fdy * k;
+                self.torch.style.transform = 'translate('+self.mx.toFixed(1)+'px,'+self.my.toFixed(1)+'px)';
         // 呼吸 + 闪烁
         var breathe = reduced ? 0 : Math.sin(t*cfg.breatheSpeed)*cfg.breatheAmp;
         var flick = reduced ? 0 : (Math.random()-0.5)*cfg.flicker;
