@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="56" viewBox="0 0 240 56">
+  <!-- 木刻纹样单元 · 240x56 无缝平铺
+       器物/工具简笔：锤 · 螺丝刀 · 齿轮 · 木工尺 + 通幅木纹线
+       刻法：同一组路径画两遍 —— 深色在「原位」、暖色偏移 (1,1)，
+             形成「凹槽 + 受光上沿」的雕刻断面，而非单纯描线。
+       两遍的 stroke-opacity 直接写死在文件里（合计约 .08 量级），
+       故引用处无需再设 opacity，也就不会连文字一起变淡。 -->
+  <defs>
+    <g id="m" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4">
+      <!-- 锤：方头 + 直柄 -->
+      <path d="M14 22h30M29 22v20"/>
+      <!-- 螺丝刀：柄轮廓 + 杆 -->
+      <path d="M78 14h14v16H78zM85 30v12"/>
+      <!-- 齿轮：外圈 + 内孔 + 四向齿 -->
+      <circle cx="140" cy="22" r="11"/>
+      <circle cx="140" cy="22" r="4"/>
+      <path d="M140 7v5M140 32v5M125 22h5M150 22h5"/>
+      <!-- 木工尺：长身 + 刻度 -->
+      <path d="M186 16h40M192 16v6M202 16v6M212 16v6M222 16v6"/>
+      <!-- 通幅木纹线：左右端点同高，保证横向无缝 -->
+      <path d="M0 48q30-6 60 0t60 0t60 0t60 0"/>
+    </g>
+  </defs>
+  <use href="#m" stroke="#1d1006" stroke-opacity=".11"/>
+  <use href="#m" stroke="#ffe3ba" stroke-opacity=".08" transform="translate(1,1)"/>
+</svg>

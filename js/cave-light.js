@@ -31,7 +31,13 @@
       sparkRate: 0.5,         // 火星基础喷发率（个/帧，随移动倍增）
       warm: '255,166,66'      // 火光暖色 RGB
     },
-    begin: function(opts){ if(!engine.started){ Object.assign(CaveLight.config, opts||{}); engine.start(); } },
+    begin: function(opts){
+      if(engine.started) return;
+      var o = opts||{}, x = o.x, y = o.y;
+      delete o.x; delete o.y;
+      Object.assign(CaveLight.config, o);
+      engine.start(x, y);
+    },
     enter: function(fn){ /* 预留：引导界面结束后的进入回调 */ CaveLight.on('reveal', fn); },
     on: function(evt, fn){ (listeners[evt]=listeners[evt]||[]).push(fn); return CaveLight; },
     emit: function(evt, data){ (listeners[evt]||[]).forEach(function(f){ try{ f(data); }catch(e){} }); }
@@ -52,10 +58,11 @@
     sparks: [],
     running: false,
 
-    start: function(){
+    start: function(x, y){
       if(this.started) return;
       this.started = true; CaveLight.started = true;
       var self = this;
+      if(typeof x==='number' && typeof y==='number'){ this.mx = x; this.my = y; }
 
       // 记忆层：文档坐标系全页画布（不显示，仅存储探索痕迹）
       this.docH = Math.max(document.documentElement.scrollHeight, innerHeight);
@@ -220,12 +227,7 @@
   };
 
   /* ---------- 启动策略 ----------
-     默认：黑暗立即生效，首次指针移动时点火（无鼠标的环境不阻塞阅读）。
-     预留接口：引导页就绪后调用 CaveLight.begin() 显式控制点火时机。 */
-  function armOnce(){
-    document.removeEventListener('pointermove', armOnce);
-    engine.start();
-  }
-  document.addEventListener('pointermove', armOnce, {once:false, passive:true});
+     点火完全由引子（cave-intro.js）通过 CaveLight.begin({x,y}) 控制；
+     引子脚本异常时由其兜底逻辑直接 begin()，不会出现无光标的死页。 */
   window.CaveLight._engine = engine;
 })();
