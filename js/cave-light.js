@@ -85,6 +85,8 @@
       this.torch.setAttribute('aria-hidden','true');
       this.torch.innerHTML = '<span class="cv-stick"></span><span class="cv-flame"><i></i><i></i><i></i></span><span class="cv-halo"></span>';
       document.body.appendChild(this.torch);
+      // 火把初始位置必须与传入坐标同步（否则元素停在默认位置、与引子木棍错位）
+      this.torch.style.transform = 'translate('+this.mx+'px,'+this.my+'px)';
 
       document.body.classList.add('cave-mode'); // 隐藏原生光标
 

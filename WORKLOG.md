@@ -231,6 +231,17 @@ personal-homepage/
 - **V1 回归**：`index.html` / `styles.css` / `main.js` 零改动（`git diff` 为空），V1 页面不含任何 V2 资源引用。
 - **体积**：cave-intro.js 8688B / cave-light.js 11046B / styles-v2.css 26930B / v2-preview.html 11609B，均 <64KB。
 
+#### 步骤 9 补充：火把与木棍位置同步 + 箭头改向（2026-09-10）
+- **需求**：①光标替换后火把位置必须与移上去的木棍同步；②「开启奇幻之旅」箭头改为向上指向木棍。
+- **根因与修复**：
+  1. **火把从未被设置初始位置**：`cave-light.js` 的 `start(x,y)` 虽接收坐标并写入 `engine.mx/my`（影响光照冲孔），但**没有设置火把 DOM 的 `transform`**——元素停留在默认位置（左上角），与飞到顶部的木棍严重错位。修复：`start()` 内建元素后立即 `torch.style.transform = translate(mx,my)`。
+  2. **木棍落点偏移 9px**：木棍带基础旋转 `rotate(-6deg)`，`getBoundingClientRect()` 返回的是**旋转后外接框**（高度被放大到 ~31px 而非实际 13px），用它换算落点会累积偏差；且原公式 `dy = (tip.y + r.height/2) - (r.top + r.height/2)` 多加了一个半高。修复：利用「旋转不改变元素中心」的性质——先取视觉中心 `(cx,cy)`，再用**未旋转尺寸** `offsetWidth/offsetHeight` 反推 `left/top`，最后以 `dx = tip.x - cx`、`dy = tip.y - cy` 做中心对齐。实测落点偏差归零。
+  3. **箭头改向**：`← 开启奇幻之旅` → `↑ 开启奇幻之旅`。
+  4. **消除"两根棍子"重影**：点燃瞬间把引子木棍 `opacity` 淡出（0.35s），与火把出现交叉过渡。
+- **验收**（受管浏览器实测）：木棍最终中心 `(640,86)` 与目标点偏差 `[0,0]`；火把 `translate(640px,86px)`、`getBoundingClientRect` 同为 `(640,86)`——三者严格重合；截图目检确认**仅一支火把、无重影、无引子残留**、火把位于视口水平正中上方并照亮周围。
+- **V1 回归**：`index.html` / `styles.css` / `main.js` 零改动。
+- **体积**：cave-intro.js 9405B / cave-light.js 11240B，均 <64KB。
+
 ---
 
 ### 步骤 10：同类调性参考站检索与 V2 优化建议（2026-09-10，并行工作线）
