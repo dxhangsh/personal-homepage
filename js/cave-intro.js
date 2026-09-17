@@ -39,7 +39,7 @@
   stick.setAttribute('role','button'); stick.setAttribute('tabindex','0');
   stick.setAttribute('aria-label','拿起火把，开启奇幻之旅');
   var stickLabel = document.createElement('div'); stickLabel.className = 'ci-sticklabel';
-  stickLabel.textContent = '← 开启奇幻之旅';
+  stickLabel.textContent = '↑ 开启奇幻之旅';
   stickWrap.appendChild(stick); stickWrap.appendChild(stickLabel);
   var fx = document.createElement('canvas'); fx.id = 'introFx'; fx.setAttribute('aria-hidden','true');
   mount.appendChild(linesBox); mount.appendChild(stickWrap); mount.appendChild(fx);
@@ -61,15 +61,18 @@
     stickLabel.classList.add('off');
     // 木棍定位到当前渲染位置 → 飞至顶部正中竖起
     var r = stick.getBoundingClientRect();
+    // 旋转（-6deg）不改变元素中心，故用视觉中心 + 未旋转尺寸换算 fixed 定位，
+    // 避免直接使用旋转后的外接框（其高度被放大到 ~31px 而非 13px）造成落点偏移。
+    var cx = r.left + r.width/2, cy = r.top + r.height/2;
+    var uw = stick.offsetWidth, uh = stick.offsetHeight;
     stick.style.position = 'fixed';
-    stick.style.left = r.left+'px'; stick.style.top = r.top+'px';
-    stick.style.width = r.width+'px'; stick.style.margin = '0';
+    stick.style.left = (cx - uw/2)+'px'; stick.style.top = (cy - uh/2)+'px';
+    stick.style.width = uw+'px'; stick.style.margin = '0';
     tip.x = Math.round(innerWidth/2);
     tip.y = Math.round(innerHeight*0.12);
     // 强制回流后触发过渡
     void stick.offsetWidth;
-    var dx = tip.x - (r.left + r.width/2);
-    var dy = (tip.y + r.height/2) - (r.top + r.height/2);
+    var dx = tip.x - cx, dy = tip.y - cy;   // 中心对齐到 tip，落点严格重合
     stick.style.transform = 'translate('+dx+'px,'+dy+'px) rotate(-84deg)';
     stick.style.transition = 'transform .95s cubic-bezier(.55,.06,.28,1)';
     stick.style.zIndex = '3';
@@ -163,6 +166,9 @@
     // 冲击爆闪 + 屏震
     mount.classList.add('shake');
     flash(tip.x, tip.y);
+    // 无缝衔接：引子木棍与火把位置重合，交叉淡出木棍避免"两根棍子"重影
+    stick.style.transition = 'opacity .35s ease';
+    stick.style.opacity = '0';
     setTimeout(function(){
       mount.classList.add('fade');
       document.body.classList.remove('ci-lock');
