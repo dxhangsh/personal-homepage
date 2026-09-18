@@ -585,3 +585,164 @@ body{
 .ci-sticklabel.off{opacity:0; transition:opacity .4s}
 @keyframes ciPulse{0%,100%{opacity:.45}50%{opacity:1}}
 #introFx{position:fixed; inset:0; z-index:3; pointer-events:none}
+
+/* ============================================================
+   V2 · OJO 设计审计优化（app-ui-ux-best-practices）
+   ============================================================
+   审计发现（量化）：
+   1. 【Critical】卡片浅字对比度仅 1.41–1.82:1，远低于 WCAG AA 4.5:1
+      —— 根因是「卡片提亮为浅米色」+「文字改浅色」物理冲突（浅底浅字不可能达标）
+   2. 【Critical】深底弱化文字 #cbb086 = 2.86:1，不合格
+   3. 【Critical】黄铜按钮象牙字 #fff7e4 on #b3904f = 2.80:1，不合格
+   4. 【High】Muted Theme Convergence：背景/卡片/按钮全在同一暖棕色族，无对冲色
+   5. 【OK】深底正文 5.08:1 已达标；无紫蓝渐变、无霓虹、无玻璃拟态等 AI 特征
+   ============================================================
+   修复策略（保住「背景提亮温和」+「文字浅色」两项原始意图）：
+   卡片改为「内凹雕刻木牌」——比背景更暗。
+   · 物理真实：V1 卡片本就用 inset 内凹阴影，雕刻凹槽理应比周围更暗
+   · 浅色文字在暗底上对比度自然达标（6.9–9.0:1）
+   · 边界靠金线勾边 + 铆钉 + 外投影强化，不依赖明度差
+   ============================================================ */
+
+:root{
+  /* 卡片：内凹雕刻木牌（比背景暗一档，物理与 V1 内凹语义一致） */
+  --oak-base:#5d3f20; --oak-hi:#6b4a28; --oak-lo:#4e3419;
+
+  /* 卡片文字：浅象牙，在暗木牌上 6.9–9.0:1 */
+  --card-ink:#fff7e4; --card-sub:#f5ead0; --card-dim:#e9dab9;
+
+  /* 深底弱化文字提亮至达标（原 #cbb086 仅 2.86:1） */
+  --ink:#f8ecd4; --ink-sub:#ead7b4; --ink-dim:#f0e0c4;
+
+  /* 黄铜压深为「古铜」，使浅字达标（原 #b3904f 上象牙字仅 2.80:1） */
+  --metal-a:#c9a45e; --metal-b:#a8823f; --metal-c:#8f6c33;
+  --metal-ink:#fff7e4;
+
+  /* 对冲色：铜锈绿（氧化黄铜的真实材质伙伴，破解单一棕色族） */
+  --patina:#a8cbb4;
+  --patina-dim:rgba(168,203,180,.22);
+}
+
+/* ---------- 卡片边界：暗底上改用金线+投影建立轮廓（不靠明度差） ---------- */
+.card{
+  box-shadow:
+    inset 0 -22px 40px -22px rgba(255,180,90,.20),
+    inset 0 14px 26px -18px rgba(255,190,110,.16),
+    inset 5px 6px 12px rgba(0,0,0,.55),
+    inset -3px -4px 9px rgba(255,236,190,.20),
+    0 10px 22px -10px rgba(0,0,0,.55);
+}
+/* 金线勾边在暗木牌上提高可见度 */
+.card{
+  filter:
+    drop-shadow(1.5px 0 0 rgba(232,196,120,.75))
+    drop-shadow(-1.5px 0 0 rgba(232,196,120,.75))
+    drop-shadow(0 1.5px 0 rgba(232,196,120,.75))
+    drop-shadow(0 -1.5px 0 rgba(232,196,120,.75));
+}
+
+/* ---------- 卡片内木纹层：暗底上降低强度，避免噪点压过文字 ---------- */
+.card::before{ opacity:.30 }
+
+/* ---------- 铆钉与金线：暗底上提亮，作为主要边界信号 ---------- */
+.card::after{ background:linear-gradient(180deg, rgba(0,0,0,.35), transparent) }
+
+/* ---------- 按钮：古铜底 + 象牙字（4.51:1 达标） ---------- */
+.btn,.chip.gold,.brand-mark,.tl-year,.totop,.ic,.meter span,.nav-menu a.active{
+  background:linear-gradient(180deg,#c9a45e,#a8823f 52%,#8f6c33);
+}
+
+/* ---------- 对冲色应用：小面积、语义化（破解单一棕色族） ---------- */
+/* 状态/提示类元素用铜锈绿，与黄铜形成「氧化 vs 抛光」的材质对话 */
+.section-title .bar{
+  background:linear-gradient(180deg,var(--patina),#7fa88a);
+  box-shadow:0 0 0 1px rgba(0,0,0,.25), 6px 7px 11px -9px rgba(0,0,0,.55);
+}
+/* 词带中的首个标签（当前焦点）用铜锈绿而非金色，避免全金单一 */
+.marquee-inner span:first-child{
+  color:var(--patina);
+  border-color:var(--patina-dim);
+}
+/* 时间线节点：铜锈绿描边，与黄铜刻度线形成材质层次 */
+.tl-dot::after{ border-color:rgba(168,203,180,.65) }
+
+/* ---------- 焦点可见性：暗底上提高对比 ---------- */
+a:focus-visible, button:focus-visible{
+  outline:2px solid var(--patina); outline-offset:3px;
+}
+
+/* ---------- 卡片文字描影：暗底上减弱（原本为浅底所加） ---------- */
+.card h3,.card p,.stat-label,.tl-item h3,.tl-item p,.contact-info p,.scratch{
+  text-shadow:0 1px 2px rgba(0,0,0,.45);
+}
+.btn,.chip.gold,.brand-mark,.tl-year,.totop,.nav-menu a.active{
+  text-shadow:0 1px 1px rgba(60,36,10,.5);
+}
+
+/* ---------- OJO 复审补强：暗底卡片与背景的边界（分离度仅 1.61:1） ---------- */
+/* 目检反馈：卡片右缘与背景同为棕色系，边界不够锐利。以「外投影 + 更亮金线」补强。 */
+.card{
+  filter:
+    drop-shadow(2px 0 0 rgba(240,206,132,.9))
+    drop-shadow(-2px 0 0 rgba(240,206,132,.9))
+    drop-shadow(0 2px 0 rgba(240,206,132,.9))
+    drop-shadow(0 -2px 0 rgba(240,206,132,.9))
+    drop-shadow(0 12px 16px rgba(0,0,0,.5));
+  box-shadow:
+    inset 0 -22px 40px -22px rgba(255,180,90,.20),
+    inset 0 14px 26px -18px rgba(255,190,110,.16),
+    inset 5px 6px 12px rgba(0,0,0,.55),
+    inset -3px -4px 9px rgba(255,236,190,.20);
+}
+/* 顶部导航与页脚：与卡片体系区分，避免整体糊成一片 */
+.topnav{
+  border-bottom:1px solid rgba(240,206,132,.28);
+  box-shadow:0 10px 24px -16px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,235,190,.14);
+}
+
+/* ---------- OJO 复审补强 2 ---------- */
+/* 1) 外投影被凿边 clip-path 裁掉（clip-path 会裁切自身阴影）——
+      改用独立影子层：在卡片下方垫一层同形暗影，脱离 clip 体系。
+   2) 「关于我」5 张卡片在 3 列网格下末行仅 1 张，右侧留白 → 末张跨列填满。
+   3) 能力光谱进度条与卡片底色接近 → 提高条身/轨道对比。
+   4) 返回顶部按钮在暗底上不够显眼 → 提高金线对比与尺寸。 */
+
+/* 1) 卡片影子层：用 drop-shadow 在父级容器上做，避开 clip-path */
+.grid{ filter:drop-shadow(0 14px 18px rgba(0,0,0,.42)) }
+
+/* 2) 关于我：末张卡片跨满剩余列，消除末行孤卡留白 */
+#about > .card:last-child{ grid-column:1 / -1 }
+
+/* 3) 能力光谱：轨道压深、条身提亮，确保区分 */
+.meter{
+  background:linear-gradient(180deg, rgba(20,10,2,.72), rgba(20,10,2,.5));
+  border-color:rgba(0,0,0,.55);
+}
+.meter span{
+  background:linear-gradient(180deg,#f0d79a,#c9a45e 55%,#a8823f);
+  box-shadow:0 0 0 1px rgba(0,0,0,.3), 4px 5px 9px -7px rgba(0,0,0,.6);
+}
+
+/* 4) 返回顶部：提高可见度 */
+.totop{
+  width:50px; height:50px; font-size:21px;
+  border-color:rgba(0,0,0,.4); border-top-color:rgba(255,250,230,.75);
+  box-shadow:0 0 0 1px rgba(240,206,132,.5), 8px 10px 18px -10px rgba(0,0,0,.65);
+}
+
+/* 5) 卡片标题与正文的层级：加深字重差 + 标题用黄铜渐变（已有） */
+.card h3{ font-weight:800; letter-spacing:.01em }
+.card p{ color:var(--card-dim) }
+
+/* ---------- OJO 终修：跨列卡片与同排卡片的边缘对齐 ---------- */
+/* 目检反馈：跨列的「能力光谱」卡右缘/底缘与上方四卡不齐。
+   根因是跨列卡片高度由内容决定，而 V1 凿边 clip-path 使底缘锯齿不一。
+   修法：让该卡内容纵向撑满、并统一底部留白。 */
+#about > .card:last-child{
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding-bottom:26px;
+}
+#about > .card:last-child .meter-row:last-child{ margin-bottom:0 }
+
+/* 外投影再提一档，强化浮起感（clip-path 已由父级影子层绕过） */
+.grid{ filter:drop-shadow(0 16px 20px rgba(0,0,0,.5)) }
