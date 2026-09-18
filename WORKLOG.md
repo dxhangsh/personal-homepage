@@ -11,7 +11,7 @@
 | --- | --- | --- | --- |
 | V1 | 阶段一 | ✅ 已完成 | 先做出一个能看的本地版本：胡桃木 × 橡木拟物化，含完整内容骨架 |
 | V2 | 阶段二 | 🚧 进行中 | 覆盖层路线与 V1 共存：质感升级 → 柔和提亮 → 洞窟探索光效 → 引子（已完成主体，待内容补齐收尾） |
-| V3 | 阶段三 | ⏳ 待开始 | 加入 Feedback 并公开发布 |
+| V3 | 阶段三 | 🚧 进行中 | 加入 Feedback（前端+后台）并发布到 GitHub Pages |
 | V4 | 阶段四 | ⏳ 待开始 | 用真实反馈完成第一月版本 |
 
 ### V2 交付物与入口（与 V1 共存，不改动任何 V1 文件）
@@ -24,6 +24,12 @@
 | `js/cave-light.js` | 洞窟光效引擎：火把光标 / 火星粒子 / 呼吸照亮 / 探索记忆（文档坐标） |
 | `js/cave-intro.js` | 洞窟引子：硫磺粉文字逐行浮现 → 木棍拿起（↑ 开启奇幻之旅）→ 粒子汇聚冲击点燃，火把与木棍位置严格重合 |
 | `assets/textures/woodcut-motif.svg` | 低透明度木刻纹样层素材 |
+| `js/config.js` | **V3** 反馈配置（填入 Supabase URL + anon key 后自动切云端） |
+| `js/feedback-store.js` | **V3** 数据层：云端（Supabase REST）/ 本地（localStorage）双模 |
+| `js/feedback-ui.js` | **V3** 反馈前端交互：校验、三态反馈、光效下可见性 |
+| `css/styles-v3.css` | **V3** 反馈表单与后台样式 |
+| `admin.html` + `js/feedback-admin.js` | **V3** 反馈后台：列表/搜索/筛选/标记已读/导出 CSV |
+| `supabase-setup.sql` | **V3** 建表与 RLS 策略脚本（在 Supabase SQL Editor 执行） |
 
 - **入口**：`http://127.0.0.1:8124/v2-preview.html`（预览服务：`python -m http.server 8124 --bind 127.0.0.1 --directory personal-homepage`）
 - **引子接口**：`window.CaveLight.begin({x,y})` 点火、`CaveLight.on('ready'|'reveal', fn)` 事件钩子
@@ -363,3 +369,41 @@ V2 期间曾有两条并行推进的工作线，本节起按时间归并编号�
 - **注意**：两线都曾写过 `body` / `:root` 覆盖，**后写者生效**。修改 `styles-v2.css` 时须检查是否与既有覆盖冲突（尤其 `body` 的 `background-image` 图层顺序，见步骤 11 踩坑 2）。
 
 ---
+
+---
+
+## V3 · 阶段三：反馈功能 + 公开发布（进行中）
+
+### 步骤 1：反馈功能实现（2026-09-17）
+
+- **课程要求**（课件）：①做一个能接收反馈的功能（访客在前端提交，数据保存到后台）；②把网站发布到 GitHub Pages（别人通过公开网址访问并提交）。达标标准：**能收到、能存下、能查到**。本版不改设计，只做「功能 + 发布」。
+- **技术选型**：延续 V2 的覆盖层架构，**不改动任何 V1 文件**；数据层设计为**双模**：
+  - **云端模式**：Supabase REST API（仅用 anon public key，数据安全由 RLS 保证）
+  - **本地模式**：浏览器 localStorage（未配置凭据时的回退，保证链路可完整测试）
+  - 凭据填入 `js/config.js` 后**自动切换**，无需改代码。
+- **新增文件**：
+  | 文件 | 作用 |
+  | --- | --- |
+  | `js/config.js` | Supabase URL + anon key（留空则走本地模式） |
+  | `js/feedback-store.js` | 数据层：`submit` / `list` / `setStatus`，双模自动路由 |
+  | `js/feedback-ui.js` | 表单校验、三态反馈（提交中/成功/失败）、光效联动 |
+  | `css/styles-v3.css` | 反馈表单与后台样式 |
+  | `admin.html` + `js/feedback-admin.js` | 后台控制台：列表、搜索、状态筛选、标记已读、导出 CSV |
+  | `supabase-setup.sql` | 建表 + RLS 策略（在 Supabase SQL Editor 执行） |
+- **反馈表结构**：`id / name / contact / message / page / ua / status / created_at`；`status` 取 `new | read | archived`。
+- **数据安全**：
+  - 前端只用 anon public key（设计上可公开），**数据安全完全由 Supabase RLS 策略保证**；
+  - `service_role` 私钥**严禁**出现在任何前端文件或提交中（已在 `.gitignore` 与代码注释中双重警示）；
+  - 策略设计：anon 可 insert（提交）、可 update（标记已读）、select 默认放开（反馈非敏感；文件内同时给出「仅登录用户可读」的严格方案供切换）。
+- **可用性关键修复（重要）**：V2 的洞窟光效默认把整页压成近全黑，**反馈表单在光效下完全不可见、无法使用**。两次尝试后确定方案：
+  1. ❌ canvas 冲孔豁免（径向渐变无法均匀覆盖纵向长条表单，实测四角 alpha 203 vs 中心 21）；
+  2. ✅ **层级豁免**：把反馈卡 `z-index` 提到 9992（高于黑暗层 9990 与火把 9991），使其在洞窟中始终完整可见——语义上即「洞窟里的一块告示牌」，配自发光边缘与投影，不依赖火把位置。
+  - 同时把火把引导点从表单中央移到**上方外侧**，避免火把与输入区抢视觉焦点。
+- **验收（本地端到端）**：
+  - **能收到**：提交成功返回成功态；短内容与错误邮箱两种校验均正确拦截且不写入；
+  - **能存下**：`localStorage` 中确认写入记录（name/contact/status/page 齐全）；
+  - **能查到**：后台列出 1 条、统计正确（总计/未读/今日）、标记已读后状态回写为 `read`、徽标同步更新；
+  - **V2 回归**：卡片 21、时间线 4 节点、词带 2 份、`revealUp` 动效生效、邮箱防爬正常、引子与光效均正常；
+  - **V1 回归**：`index.html` / `styles.css` / `main.js` 零改动。
+- **体积**：全部新增文件 <64KB（最大 `js/cave-light.js` 13.4KB）。
+- **待办（需用户提供）**：Supabase 项目凭据、GitHub 账号 —— 用于切换云端模式并完成公开发布。
