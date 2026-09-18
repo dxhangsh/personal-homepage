@@ -100,6 +100,9 @@
 
       document.body.classList.add('cave-mode'); // 隐藏原生光标
 
+      // 功能豁免区：这些区域在洞窟光效下仍需可辨识可操作（如反馈表单）
+      this.exempts = Array.prototype.slice.call(document.querySelectorAll('[data-cave-exempt]'));
+
       window.addEventListener('resize', function(){ self.resize(); });
       window.addEventListener('pointermove', function(e){ self.onMove(e); }, {passive:true});
       window.addEventListener('pointerdown', function(e){ self.burst(e.clientX, e.clientY, 14); }, {passive:true});

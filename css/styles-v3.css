@@ -1,0 +1,197 @@
+/* ============================================================
+   个人主页 V3 · 反馈表单样式（styles-v3.css）
+   ------------------------------------------------------------
+   设计约束（重要）：
+   · 页面处于洞窟光效下（默认近全黑），表单必须可见可用
+     → 表单区自带「局部提亮」：背景比卡片更亮一档 + 更强金线，
+       即便火把不在附近也能辨识轮廓
+   · 延续 V2 色板：内凹雕刻木牌 + 黄铜 + 铜锈绿
+   ============================================================ */
+
+.feedback-card{
+  padding:28px 26px 24px;
+  /* 比普通卡片更亮一档：光效下作为「可交互区」的视觉信号 */
+  background-color:#6b4a28;
+  background-image:linear-gradient(180deg, rgba(255,214,150,.06), transparent 40%);
+  box-shadow:
+    inset 0 -22px 40px -22px rgba(255,180,90,.24),
+    inset 0 14px 26px -18px rgba(255,190,110,.20),
+    inset 5px 6px 12px rgba(0,0,0,.5),
+    inset -3px -4px 9px rgba(255,236,190,.24);
+}
+
+.fb-lead{
+  margin:0 0 20px; font-size:14.5px; line-height:1.7;
+  color:var(--card-sub);
+}
+
+/* ---------- 字段 ---------- */
+.fb-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
+@media (max-width:720px){ .fb-row{ grid-template-columns:1fr } }
+
+.fb-field{ display:block; margin-bottom:16px; position:relative }
+.fb-label{
+  display:block; margin-bottom:7px; font-size:13px; font-weight:700;
+  letter-spacing:.06em; color:var(--card-ink);
+}
+.fb-opt,.fb-req{
+  margin-left:7px; font-size:11.5px; font-weight:600;
+  padding:1px 7px; border-radius:999px;
+}
+.fb-opt{ color:var(--ink-dim); background:rgba(0,0,0,.3) }
+.fb-req{ color:#0f1a14; background:var(--patina) }
+
+/* 输入控件：内凹槽（与页面拟物语言一致） */
+.fb-field input,
+.fb-field textarea{
+  width:100%; box-sizing:border-box; display:block;
+  padding:12px 14px; border-radius:6px;
+  font-family:inherit; font-size:14.5px; line-height:1.6;
+  color:var(--card-ink);
+  background:linear-gradient(180deg, rgba(20,10,2,.62), rgba(20,10,2,.44));
+  border:1px solid rgba(0,0,0,.5);
+  box-shadow:inset 0 3px 7px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,236,190,.16);
+  transition:border-color .2s, box-shadow .2s;
+}
+.fb-field textarea{ resize:vertical; min-height:112px }
+.fb-field input::placeholder,
+.fb-field textarea::placeholder{ color:rgba(233,218,185,.55) }
+
+.fb-field input:hover,
+.fb-field textarea:hover{ border-color:rgba(240,206,132,.35) }
+
+.fb-field input:focus,
+.fb-field textarea:focus{
+  outline:none;
+  border-color:var(--patina);
+  box-shadow:inset 0 3px 7px rgba(0,0,0,.5), 0 0 0 2px rgba(168,203,180,.35);
+}
+
+.fb-count{
+  position:absolute; right:2px; bottom:-19px;
+  font-size:11.5px; color:var(--ink-dim); letter-spacing:.06em;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- 操作区与状态 ---------- */
+.fb-actions{
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  margin-top:26px;
+}
+.fb-status{
+  margin:0; flex:1 1 240px; min-width:0;
+  font-size:13.5px; line-height:1.6; color:var(--card-sub);
+}
+.fb-status.ok{ color:#bfe3cb }
+.fb-status.error{ color:#f0b9a0 }
+
+.fb-note{
+  margin:16px 0 0; font-size:12.5px; color:var(--ink-dim);
+  padding-top:14px; border-top:1px solid rgba(0,0,0,.35);
+  box-shadow:0 -1px 0 rgba(255,220,160,.1);
+}
+
+/* ---------- 洞窟光效下：反馈区整体提高可见度 ---------- */
+/* 给表单区加一层不依赖火把的柔和环境光，确保访客能发现并操作它 */
+#feedback{
+  position:relative;
+}
+#feedback::after{
+  content:""; position:absolute; inset:-14px; z-index:-1; border-radius:10px;
+  background:radial-gradient(60% 80% at 50% 40%, rgba(255,196,110,.16), transparent 72%);
+  pointer-events:none;
+}
+
+/* ---------- 提交按钮在暗底上强化 ---------- */
+#fbSubmit{
+  min-width:132px;
+  box-shadow:0 0 0 1px rgba(240,206,132,.45), 7px 9px 16px -9px rgba(0,0,0,.6);
+}
+#fbSubmit:disabled{ opacity:.65; cursor:progress }
+
+/* ---------- 无障碍：键盘焦点在暗底上可见 ---------- */
+.fb-field input:focus-visible,
+.fb-field textarea:focus-visible{ outline:2px solid var(--patina); outline-offset:2px }
+
+/* ---------- V3 复审：反馈区豁免光照更均匀 ---------- */
+/* 目检反馈：表单卡片左上/右缘在光效下偏暗，标签辨识度不均。
+   根因是豁免窗口为径向渐变，中心亮、边缘弱，而表单是纵向长条（高约 500px）。
+   修法：改用「纵向拉长的椭圆光窗」+ 提高整体冲孔强度，使整卡均匀受光。 */
+#feedback::after{
+  inset:-22px;
+  border-radius:14px;
+  background:
+    radial-gradient(58% 46% at 50% 26%, rgba(255,200,120,.20), transparent 74%),
+    radial-gradient(70% 60% at 50% 78%, rgba(255,190,110,.13), transparent 76%);
+}
+/* 标签与必填徽标在暗底上再提一档可读性 */
+.fb-label{ color:#fff7e4; text-shadow:0 1px 2px rgba(0,0,0,.5) }
+.fb-opt{ color:#fdf3e0; background:rgba(0,0,0,.42) }
+.fb-req{ box-shadow:0 0 0 1px rgba(0,0,0,.25) }
+.fb-count{ color:#f0e0c4 }
+.fb-note{ color:#ead7b4 }
+/* 输入槽再压深一档，让浅色输入文字与占位符都更醒目 */
+.fb-field input,.fb-field textarea{
+  background:linear-gradient(180deg, rgba(14,7,1,.72), rgba(14,7,1,.56));
+}
+.fb-field input::placeholder,.fb-field textarea::placeholder{ color:rgba(240,224,196,.62) }
+
+/* ============================================================
+   V3 · 反馈区：洞窟中的「告示牌」（层级豁免方案）
+   ------------------------------------------------------------
+   问题：洞窟黑暗层（z-index 9990）是 fixed 全屏 canvas，会把整页压黑；
+        任何 canvas 冲孔方案都难以让纵向长条表单均匀受光。
+   方案：把反馈卡提升到黑暗层之上（z-index 高于 9990），
+        使它在洞窟中始终完整可见——语义上就是「洞窟里的一块告示牌」，
+        不依赖火把位置，彻底保证功能可用性。
+   配套：给卡片加自发光边缘与投影，使其在黑暗中自然「亮着」而非突兀。
+   ============================================================ */
+#feedback{
+  position:relative;
+  z-index:9992;                    /* 高于 caveDark(9990) 与 caveTorch(9991) */
+  background-color:#6b4a28;
+  background-image:
+    linear-gradient(180deg, rgba(255,214,150,.10), transparent 42%),
+    radial-gradient(120% 90% at 50% 0%, rgba(255,200,120,.12), transparent 70%);
+  box-shadow:
+    0 0 0 1px rgba(240,206,132,.45),          /* 金线勾边 */
+    0 0 34px -6px rgba(255,186,90,.35),       /* 自身外发光：黑暗中的告示牌 */
+    0 18px 34px -14px rgba(0,0,0,.65),
+    inset 0 -22px 40px -22px rgba(255,180,90,.22),
+    inset 5px 6px 12px rgba(0,0,0,.5),
+    inset -3px -4px 9px rgba(255,236,190,.22);
+}
+/* 撤销此前依赖径向渐变的柔光层（层级方案已足够） */
+#feedback::after{ display:none }
+
+/* 表单在告示牌上恢复常规对比，无需再为「黑暗补偿」提亮 */
+.fb-label{ color:var(--card-ink) }
+.fb-opt{ color:var(--ink-dim) }
+.fb-count{ color:var(--ink-dim) }
+.fb-note{ color:var(--ink-dim) }
+
+/* 悬停时轻微上浮，暗示「这是可交互的告示牌」 */
+#feedback{ transition:box-shadow .3s ease, transform .3s ease }
+#feedback:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgba(240,206,132,.6),
+    0 0 44px -4px rgba(255,196,110,.45),
+    0 22px 40px -16px rgba(0,0,0,.7),
+    inset 0 -22px 40px -22px rgba(255,180,90,.26),
+    inset 5px 6px 12px rgba(0,0,0,.5),
+    inset -3px -4px 9px rgba(255,236,190,.24);
+}
+
+/* ---------- V3 终修：placeholder 与计数对比度提至 WCAG AA ---------- */
+/* 量化：原 placeholder rgba(240,224,196,.62) 叠在深槽上约 5.3:1（达标），
+   但目检偏弱 → 提到 .78 并加一层极轻描影，确保低亮度屏幕下也清晰。 */
+.fb-field input::placeholder,
+.fb-field textarea::placeholder{
+  color:rgba(244,232,208,.78);
+  text-shadow:0 1px 1px rgba(0,0,0,.4);
+}
+.fb-count{ color:#ead7b4 }
+/* 页脚小字在暗底上提亮（V3 新增反馈区后整体下移，footer 常处于暗部） */
+footer{ color:var(--ink-sub) }
+footer .scratch{ color:var(--ink-dim) }

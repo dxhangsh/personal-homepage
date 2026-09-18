@@ -9,7 +9,8 @@
 <meta name="author" content="陈胤璋" />
 <title>陈胤璋 · 个人主页 V2 预览</title>
 <link rel="stylesheet" href="css/styles.css?v=4" />
-<link rel="stylesheet" href="css/styles-v2.css?v=8" />
+<link rel="stylesheet" href="css/styles-v2.css?v=9" />
+<link rel="stylesheet" href="css/styles-v3.css?v=4" />
 </head>
 <body>
 <!-- 洞窟引子（cave-intro.js 在此挂载文字/木棍/粒子画布） -->
@@ -25,6 +26,7 @@
       <li><a href="#projects">项目作品</a></li>
       <li><a href="#skills">技能服务</a></li>
       <li><a href="#contact">联系我</a></li>
+      <li><a href="#feedback">留下反馈</a></li>
     </ul>
     <a class="btn btn-nav ghost" href="index.html">返回 V1 正式版</a>
   </div>
@@ -152,6 +154,37 @@
     </div>
     <a class="btn" id="mailBtn" href="#contact" rel="nofollow">给我发送消息</a>
   </section>
+
+  <!-- 留下反馈（V3） -->
+  <div class="section-title"><span class="bar"></span><h2>留下反馈</h2></div>
+  <section id="feedback" aria-label="留下反馈" class="card feedback-card" data-cave-exempt>
+    <form id="fbForm" novalidate>
+      <p class="fb-lead">这个主页还在成长。你看到的任何问题、想法，或者只是想说句话——都欢迎写在这里，我会认真读每一条。</p>
+      <div class="fb-row">
+        <label class="fb-field">
+          <span class="fb-label">怎么称呼你<span class="fb-opt">选填</span></span>
+          <input id="fbName" name="name" type="text" maxlength="40" autocomplete="name" placeholder="留个称呼就好">
+        </label>
+        <label class="fb-field">
+          <span class="fb-label">邮箱<span class="fb-opt">选填，方便我回信</span></span>
+          <input id="fbContact" name="contact" type="email" maxlength="80" autocomplete="email" placeholder="name@example.com">
+        </label>
+      </div>
+      <label class="fb-field">
+        <span class="fb-label">想说的话<span class="fb-req">必填</span></span>
+        <textarea id="fbMsg" name="message" rows="5" maxlength="600" required
+                  placeholder="比如：某个地方看不明白、想看到什么内容、或者发现了什么问题……"></textarea>
+        <span id="fbCount" class="fb-count">0 / 600</span>
+      </label>
+      <div class="fb-actions">
+        <button class="btn" id="fbSubmit" type="submit">发送反馈</button>
+        <p id="fbStatus" class="fb-status" role="status" aria-live="polite"></p>
+      </div>
+      <p class="fb-note">反馈不会自动公开，只有我本人在后台能看到。</p>
+      <noscript><p class="fb-status error">启用 JavaScript 后才能提交反馈。</p></noscript>
+    </form>
+  </section>
+
   <footer>
     <p>© 2026 陈胤璋 · 本页面为 Vibe Coding 课程主页 —— 胡桃木 × 橡木拟物化</p>
     <p class="footer-meta"><span>汕头 · 广东</span><span class="fmid">2026 · 高中在读</span><span>方向 BCI</span></p>
@@ -165,7 +198,10 @@
 
 <script src="js/main.js"></script>
 <script src="js/v2-enhance.js"></script>
-<script src="js/cave-light.js?v=8"></script>
+<script src="js/cave-light.js?v=11"></script>
 <script src="js/cave-intro.js?v=4"></script>
+<script src="js/config.js?v=1"></script>
+<script src="js/feedback-store.js?v=1"></script>
+<script src="js/feedback-ui.js?v=3"></script>
 </body>
 </html>

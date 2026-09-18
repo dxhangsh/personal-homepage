@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>反馈后台 · 陈胤璋</title>
+<link rel="stylesheet" href="css/styles.css" />
+<link rel="stylesheet" href="css/styles-v2.css?v=9" />
+<link rel="stylesheet" href="css/styles-v3.css?v=1" />
+<style>
+/* 后台为「工作台」定位：不做洞窟光效，信息密度优先，但沿用同一材质语言 */
+.admin-wrap{max-width:1120px;margin:0 auto;padding:34px 22px 60px}
+.admin-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.admin-head h1{margin:0;font-size:26px;letter-spacing:-.2px;
+  background-image:linear-gradient(180deg,#fdf2c8,#e8c878 55%,#b58c40);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.mode-tag{font-size:12px;padding:3px 10px;border-radius:999px;letter-spacing:.08em;
+  background:rgba(0,0,0,.34);color:var(--ink-dim);border:1px solid rgba(240,206,132,.22)}
+.mode-tag.cloud{color:#0f1a14;background:var(--patina);border-color:transparent}
+.admin-sub{margin:0 0 22px;font-size:13.5px;color:var(--ink-sub);line-height:1.7}
+
+.admin-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.admin-bar input[type=search]{
+  flex:1 1 220px;min-width:0;padding:10px 13px;border-radius:6px;font-family:inherit;font-size:14px;
+  color:var(--card-ink);background:linear-gradient(180deg,rgba(20,10,2,.6),rgba(20,10,2,.42));
+  border:1px solid rgba(0,0,0,.5);box-shadow:inset 0 3px 7px rgba(0,0,0,.5);
+}
+.admin-bar input[type=search]::placeholder{color:rgba(233,218,185,.5)}
+.filter-btn{
+  padding:9px 15px;border-radius:6px;cursor:pointer;font-size:13.5px;font-weight:700;
+  color:var(--ink-sub);background:rgba(0,0,0,.3);border:1px solid rgba(240,206,132,.2);
+  transition:.2s;
+}
+.filter-btn:hover{color:var(--ink);border-color:rgba(240,206,132,.4)}
+.filter-btn.on{color:#0f1a14;background:var(--patina);border-color:transparent}
+
+.stat-row{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:20px;font-size:13.5px;color:var(--ink-sub)}
+.stat-row b{color:var(--metal-b);font-size:16px;margin-right:4px}
+
+.fb-list{display:grid;gap:14px}
+.fb-item{padding:18px 20px 16px}
+.fb-item-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:9px}
+.fb-who{font-size:14.5px;font-weight:800;color:var(--card-ink)}
+.fb-who span{font-weight:600;color:var(--card-dim);margin-left:8px;font-size:13px}
+.fb-when{font-size:12.5px;color:var(--ink-dim);font-variant-numeric:tabular-nums}
+.fb-text{margin:0;font-size:14.5px;line-height:1.75;color:var(--card-sub);white-space:pre-wrap;word-break:break-word}
+.fb-meta{margin-top:12px;padding-top:11px;border-top:1px solid rgba(0,0,0,.35);
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--ink-dim)}
+.badge-new{font-size:11px;padding:2px 9px;border-radius:999px;font-weight:700;
+  color:#0f1a14;background:var(--patina)}
+.badge-read{font-size:11px;padding:2px 9px;border-radius:999px;
+  color:var(--ink-sub);background:rgba(0,0,0,.3)}
+.act{background:none;border:0;color:var(--metal-b);font-size:12.5px;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;padding:0}
+.act:hover{color:var(--ink)}
+.empty{padding:40px 20px;text-align:center;color:var(--ink-sub);font-size:14px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-head">
+    <h1>反馈后台</h1>
+    <span id="modeTag" class="mode-tag">读取中…</span>
+  </div>
+  <p class="admin-sub">
+    这里是你收到的全部反馈。反馈不会自动公开，只有你能看到。
+    <span id="noteLocal"></span>
+  </p>
+
+  <div class="stat-row">
+    <span><b id="cTotal">0</b>条总计</span>
+    <span><b id="cNew">0</b>条未读</span>
+    <span><b id="cToday">0</b>条今天</span>
+  </div>
+
+  <div class="admin-bar">
+    <input id="q" type="search" placeholder="搜索称呼、邮箱或内容…" aria-label="搜索反馈" />
+    <button class="filter-btn on" data-f="all">全部</button>
+    <button class="filter-btn" data-f="new">未读</button>
+    <button class="filter-btn" data-f="read">已读</button>
+    <button class="filter-btn" id="exportBtn" style="margin-left:auto">导出 CSV</button>
+  </div>
+
+  <div id="list" class="fb-list"></div>
+</div>
+
+<script src="js/config.js?v=1"></script>
+<script src="js/feedback-store.js?v=1"></script>
+<script src="js/feedback-admin.js?v=1"></script>
+</body>
+</html>

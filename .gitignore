@@ -1,19 +1,19 @@
-# 密钥与隐私（绝不提交）
+# 依赖与系统文件
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+
+# 私密凭据（严禁提交）
 .env
 .env.*
 *.key
 *.pem
 service_role*.json
 supabase/.env*
+.deepworks/
 
-# 依赖（本项目零依赖，纯静态；如引入再调整）
-node_modules/
-
-# 系统与编辑器
-.DS_Store
-Thumbs.db
-*.log
-
-# 过程/临时文件（仅在开发目录，不进版本库）
-_work/
-*.tmp
+# 说明：
+# js/config.js 里的 supabaseUrl 与 anon public key 是「设计上可公开」的前端密钥，
+# 数据安全由 Supabase 的 RLS 行级安全策略保证，因此该文件可以正常提交。
+# 但 service_role 私钥拥有数据库完全控制权，绝不能出现在任何提交中。
