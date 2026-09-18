@@ -2,6 +2,15 @@
 
 一个纯静态（零构建、零依赖）的个人主页，胡桃木 × 橡木拟物化风格。
 
+## 在线访问
+
+**https://dxhangsh.github.io/personal-homepage/**
+
+- 主页（含反馈入口）：`v2-preview.html`
+- 反馈后台（仅本人使用，已设 noindex）：`admin.html`
+
+反馈数据存放在 Supabase 云端，其他人提交的内容不会自动公开，只有本人在后台可见。
+
 ## 版本
 
 | 版本 | 内容 |
