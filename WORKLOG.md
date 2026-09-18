@@ -407,3 +407,23 @@ V2 期间曾有两条并行推进的工作线，本节起按时间归并编号�
   - **V1 回归**：`index.html` / `styles.css` / `main.js` 零改动。
 - **体积**：全部新增文件 <64KB（最大 `js/cave-light.js` 13.4KB）。
 - **待办（需用户提供）**：Supabase 项目凭据、GitHub 账号 —— 用于切换云端模式并完成公开发布。
+
+### 步骤 2：接入 Supabase 云端（2026-09-18）
+
+- **凭据接入**：把 Supabase 项目 URL 与 anon public key 填入 `js/config.js`，数据层自动切到云端模式（无需改任何逻辑代码）。
+- **缓存治理**：`config.js` 版本号递增至 `v2`（`v2-preview.html` / `admin.html` 同步），并把 `admin.html` 的 `styles-v3.css` 版本号对齐至 `v4`。
+- **云端连通性自检（curl 直连 REST API）**：
+  | 能力 | 请求 | 结果 |
+  | --- | --- | --- |
+  | 读取（表存在 + RLS 放行） | `GET /rest/v1/feedback` | ✅ HTTP 200 |
+  | 写入（能存下） | `POST /rest/v1/feedback` | ✅ HTTP 201，返回完整行含 UUID |
+  | 查询（能查到） | `GET ...?order=created_at.desc` | ✅ HTTP 200 |
+  | 状态更新（后台标记已读） | `PATCH ...?id=eq.<uuid>` | ✅ HTTP 200，`status` 回写成功 |
+- **浏览器端到端实测（受管 Playwright）**：
+  - 页面加载后 `FeedbackStore.mode()` 返回 **`cloud`**，配置生效；
+  - 真实填写表单（称呼/邮箱/正文）并点击发送 → 前端提示「收到了，谢谢你的反馈！已保存到我的云端后台」，表单清空；
+  - 直连 REST 复核：云端确实存在该条记录（name/contact/message/page/status/created_at 齐全，`status=new`）；
+  - 打开 `admin.html` → 显示「**云端模式（Supabase）**」，统计「2 条总计 / 1 条未读 / 2 条今天」，列表渲染正确；
+  - 点击「标记为已读」→ 统计变为「0 条未读」，徽标同步为「已读」，云端 `status` 确认回写。
+- **结论**：课程达标标准 **「能收到、能存下、能查到」在云端模式下全部通过**。
+- **遗留说明**：RLS 未开放 `delete` 策略（属有意设计，避免匿名删数据），故连通性自检产生的那条测试记录以 `archived` 状态归档，可在 Supabase 控制台 Table Editor 手动删除。
