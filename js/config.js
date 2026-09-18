@@ -14,8 +14,8 @@
    ============================================================ */
 window.FEEDBACK_CONFIG = {
   /* 形如 https://xxxxxxxxxxxx.supabase.co */
-  supabaseUrl: '',
+  supabaseUrl: 'https://csgldskripcpueerosxb.supabase.co',
 
   /* Supabase 项目设置 → API → Project API keys → anon / public */
-  supabaseAnonKey: ''
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzZ2xkc2tyaXBjcHVlZXJvc3hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3MTc4OTcsImV4cCI6MjEwNTI5Mzg5N30.YyG12P9oIz-7l4TO-zQWa1HEORZexk7KLF4wp7fwHoQ'
 };
