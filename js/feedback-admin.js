@@ -64,10 +64,14 @@
         '</div>' +
         '<p class="fb-text">' + esc(r.message) + '</p>' +
         '<div class="fb-meta">' +
-          (st === 'new' ? '<span class="badge-new">未读</span>' : '<span class="badge-read">已读</span>') +
+          (st === 'new' ? '<span class="badge-new">未读</span>'
+            : st === 'archived' ? '<span class="badge-arch">已归档</span>'
+            : '<span class="badge-read">已读</span>') +
           '<span>来源：' + esc(r.page || '—') + '</span>' +
           (st === 'new'
             ? '<button class="act" data-mark="read" data-id="' + esc(r.id) + '">标记为已读</button>'
+            : st === 'archived'
+            ? '<button class="act" data-mark="read" data-id="' + esc(r.id) + '">恢复为已读</button>'
             : '<button class="act" data-mark="new" data-id="' + esc(r.id) + '">标记为未读</button>') +
         '</div>' +
       '</article>';
@@ -117,7 +121,8 @@
     var lines = [head.join(',')];
     visible().forEach(function(r){
       var cells = [fmt(r.created_at), r.name, r.contact, r.message, r.page,
-                   (r.status || 'new') === 'new' ? '未读' : '已读'];
+                   (r.status || 'new') === 'new' ? '未读'
+                     : (r.status === 'archived' ? '已归档' : '已读')];
       lines.push(cells.map(function(c){
         return '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"';
       }).join(','));
