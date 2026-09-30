@@ -13,7 +13,7 @@
 <title>陈胤璋 · 个人主页 V2 预览</title>
 <link rel="stylesheet" href="css/styles.css?v=4" />
 <link rel="stylesheet" href="css/styles-v2.css?v=9" />
-<link rel="stylesheet" href="css/styles-v3.css?v=4" />
+<link rel="stylesheet" href="css/styles-v3.css?v=6" />
 </head>
 <body>
 <!-- 洞窟引子（cave-intro.js 在此挂载文字/木棍/粒子画布） -->
@@ -173,6 +173,32 @@
           <input id="fbContact" name="contact" type="email" maxlength="80" autocomplete="email" placeholder="name@example.com">
         </label>
       </div>
+      <div class="fb-row">
+        <label class="fb-field">
+          <span class="fb-label">你和我的关系<span class="fb-opt">选填</span></span>
+          <select id="fbRelation" name="relation">
+            <option value="">— 选择最接近的一个 —</option>
+            <option value="同学">同学 / 校友</option>
+            <option value="学长学姐">学长 / 学姐</option>
+            <option value="家人">家人 / 亲戚</option>
+            <option value="在职人士">在职人士</option>
+            <option value="HR或招聘">HR / 招聘</option>
+            <option value="老师">老师</option>
+            <option value="其他">其他</option>
+          </select>
+        </label>
+        <label class="fb-field">
+          <span class="fb-label">发现问题的设备<span class="fb-opt">选填</span></span>
+          <select id="fbDevice" name="device">
+            <option value="">— 你当时用什么打开的 —</option>
+            <option value="手机">手机</option>
+            <option value="平板">平板</option>
+            <option value="笔记本">笔记本</option>
+            <option value="台式机">台式机</option>
+            <option value="不涉及">不涉及具体设备</option>
+          </select>
+        </label>
+      </div>
       <label class="fb-field">
         <span class="fb-label">想说的话<span class="fb-req">必填</span></span>
         <textarea id="fbMsg" name="message" rows="5" maxlength="600" required
@@ -204,7 +230,7 @@
 <script src="js/cave-light.js?v=11"></script>
 <script src="js/cave-intro.js?v=4"></script>
 <script src="js/config.js?v=2"></script>
-<script src="js/feedback-store.js?v=1"></script>
-<script src="js/feedback-ui.js?v=3"></script>
+<script src="js/feedback-store.js?v=2"></script>
+<script src="js/feedback-ui.js?v=4"></script>
 </body>
 </html>

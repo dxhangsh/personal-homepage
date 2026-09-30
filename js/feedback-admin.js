@@ -67,6 +67,8 @@
           (st === 'new' ? '<span class="badge-new">未读</span>'
             : st === 'archived' ? '<span class="badge-arch">已归档</span>'
             : '<span class="badge-read">已读</span>') +
+          (r.relation ? '<span>身份：' + esc(r.relation) + '</span>' : '') +
+          (r.device ? '<span>设备：' + esc(r.device) + '</span>' : '') +
           '<span>来源：' + esc(r.page || '—') + '</span>' +
           (st === 'new'
             ? '<button class="act" data-mark="read" data-id="' + esc(r.id) + '">标记为已读</button>'
@@ -117,10 +119,11 @@
 
   /* ---------- 导出 CSV（含 BOM，Excel 中文不乱码） ---------- */
   document.getElementById('exportBtn').addEventListener('click', function(){
-    var head = ['时间', '称呼', '邮箱', '内容', '来源页面', '状态'];
+    var head = ['时间', '称呼', '邮箱', '身份关系', '设备', '内容', '来源页面', '状态'];
     var lines = [head.join(',')];
     visible().forEach(function(r){
-      var cells = [fmt(r.created_at), r.name, r.contact, r.message, r.page,
+      var cells = [fmt(r.created_at), r.name, r.contact, r.relation || '', r.device || '',
+                   r.message, r.page,
                    (r.status || 'new') === 'new' ? '未读'
                      : (r.status === 'archived' ? '已归档' : '已读')];
       lines.push(cells.map(function(c){

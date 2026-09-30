@@ -39,8 +39,10 @@
   }
 
   /* ---------- 统一条目结构 ----------
-     { id, name, contact, message, page, ua, created_at, status }
-     status: new | read | archived                                        */
+     { id, name, contact, message, page, ua, relation, device, created_at, status }
+     relation: 反馈者与站主的关系（同学/家人/在职人士/HR…）
+     device:   反馈者发现问题时使用的设备（手机/平板/笔记本/台式机）
+     status:   new | read | archived                                        */
 
   function normalize(row){
     return {
@@ -50,6 +52,8 @@
       message: row.message || '',
       page: row.page || '',
       ua: row.ua || '',
+      relation: row.relation || '',
+      device: row.device || '',
       created_at: row.created_at || new Date().toISOString(),
       status: row.status || 'new'
     };
@@ -64,6 +68,7 @@
         id: 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
         name: data.name, contact: data.contact, message: data.message,
         page: data.page, ua: navigator.userAgent.slice(0, 180),
+        relation: data.relation, device: data.device,
         created_at: new Date().toISOString(), status: 'new'
       });
 
@@ -74,21 +79,44 @@
           : Promise.reject(new Error('浏览器本地存储不可用（可能处于隐私模式）'));
       }
 
-      return fetch(CFG.supabaseUrl.replace(/\/$/, '') + '/rest/v1/' + TABLE, {
-        method: 'POST', headers: headers(),
-        body: JSON.stringify({
-          name: entry.name, contact: entry.contact, message: entry.message,
-          page: entry.page, ua: entry.ua
-        })
-      }).then(function(res){
-        if(!res.ok){
-          return res.text().then(function(t){
-            throw new Error('云端写入失败（' + res.status + '）：' + (t || '').slice(0, 160));
+      /* 云端写入：V4 新增 relation / device 两列。
+         若后台表尚未执行加列迁移，PostgREST 会返回 400（PGRST204），
+         此时自动降级为不含新字段重试一次，保证表单永远可用。 */
+      var send = function(payload){
+        return fetch(CFG.supabaseUrl.replace(/\/$/, '') + '/rest/v1/' + TABLE, {
+          method: 'POST', headers: headers(),
+          body: JSON.stringify(payload)
+        }).then(function(res){
+          if(!res.ok){
+            return res.text().then(function(t){
+              var err = new Error('云端写入失败（' + res.status + '）：' + (t || '').slice(0, 160));
+              err.status = res.status;
+              try{ err.code = JSON.parse(t).code; }catch(e){}
+              throw err;
+            });
+          }
+          return res.json().then(function(rows){
+            return { ok: true, mode: 'cloud', entry: normalize(rows[0] || payload) };
+          });
+        });
+      };
+      var full = {
+        name: entry.name, contact: entry.contact, message: entry.message,
+        page: entry.page, ua: entry.ua,
+        relation: entry.relation, device: entry.device
+      };
+      return send(full).catch(function(err){
+        if(err && err.status === 400){
+          var lite = {
+            name: entry.name, contact: entry.contact, message: entry.message,
+            page: entry.page, ua: entry.ua
+          };
+          return send(lite).then(function(res){
+            res.degraded = true;   /* 后台表暂缺 relation/device 列，本次未收集 */
+            return res;
           });
         }
-        return res.json().then(function(rows){
-          return { ok: true, mode: 'cloud', entry: normalize(rows[0] || entry) };
-        });
+        throw err;
       });
     },
 
