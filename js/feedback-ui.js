@@ -13,6 +13,8 @@
   var msgEl   = document.getElementById('fbMsg');
   var nameEl  = document.getElementById('fbName');
   var mailEl  = document.getElementById('fbContact');
+  var relEl   = document.getElementById('fbRelation');
+  var devEl   = document.getElementById('fbDevice');
   var statusEl= document.getElementById('fbStatus');
   var submitEl= document.getElementById('fbSubmit');
   var countEl = document.getElementById('fbCount');
@@ -52,7 +54,9 @@
       return null;
     }
     return { name: nameEl.value.trim(), contact: mail, message: msg,
-             page: location.pathname };
+             page: location.pathname,
+             relation: relEl ? relEl.value : '',
+             device:   devEl ? devEl.value : '' };
   }
 
   /* ---------- 提交 ---------- */
@@ -69,7 +73,8 @@
       form.reset();
       syncCount();
       var where = res.mode === 'cloud' ? '已保存到我的云端后台' : '已保存在本机（云端未配置）';
-      say('收到了，谢谢你的反馈！' + where + '，我会认真读的。', 'ok');
+      var extra = res.degraded ? '（后台字段升级中，身份与设备本次未记录）' : '';
+      say('收到了，谢谢你的反馈！' + where + extra + '，我会认真读的。', 'ok');
       submitEl.disabled = false;
       submitEl.textContent = '再写一条';
     }).catch(function(err){

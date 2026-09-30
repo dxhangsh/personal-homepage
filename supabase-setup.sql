@@ -54,3 +54,15 @@ create policy "anon can read feedback"
 -- 6) 索引：后台按时间倒序展示
 create index if not exists feedback_created_at_idx
   on public.feedback (created_at desc);
+
+-- ============================================================
+-- V4 · 加列迁移（2026-09-25）
+-- 用法：Supabase 控制台 → SQL Editor → 粘贴执行
+-- 说明：为反馈表补充课程要求的两个字段（09-17 课件逐条点名）：
+--   relation —— 反馈者与站主的关系（同学/家人/在职人士/HR…）
+--   device   —— 反馈者发现问题时使用的设备（手机/平板/笔记本…）
+-- 两列均可空，历史数据不受影响；IF NOT EXISTS 保证可重复执行。
+-- 前端已做降级兼容：本迁移未执行前，表单仍可正常提交（仅这两项不收集）。
+-- ============================================================
+alter table public.feedback add column if not exists relation text;
+alter table public.feedback add column if not exists device   text;
