@@ -27,7 +27,12 @@
 
 /* ---------- 字段 ---------- */
 .fb-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
-@media (max-width:720px){ .fb-row{ grid-template-columns:1fr } }
+@media (max-width:720px){
+  .fb-row{ grid-template-columns:1fr }
+  /* V4 · F3 移动端可读性（反馈 2026-09：手机上字小） */
+  .fb-lead{ font-size:15.5px; line-height:1.8 }
+  .fb-text{ font-size:15.5px; line-height:1.8 }
+}
 
 .fb-field{ display:block; margin-bottom:16px; position:relative }
 .fb-label{

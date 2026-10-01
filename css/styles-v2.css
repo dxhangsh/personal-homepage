@@ -265,6 +265,17 @@ a:focus-visible, button:focus-visible{
 }
 
 /* ============================================================
+   V4 · F3 移动端可读性（反馈 2026-09：手机上字小、行距密）
+   只调可读性（字号↑ 行距↑），不动主题暗度与版式结构
+   ============================================================ */
+@media (max-width:720px){
+  body{ line-height:1.78 }
+  .card p{ font-size:15.5px }
+  .hero-meta{ font-size:16px }
+  .scratch{ font-size:13px }
+}
+
+/* ============================================================
    V2 质感升级 · 第二阶段（Magic UI / Awwwards / CSS 滚动驱动）
    新区块：里程碑数字 / 探索时间线 / 兴趣词带 / 滚动提示
    动效：CSS scroll-driven animations（view() 时间线，零 JS）
