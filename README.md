@@ -18,17 +18,18 @@
 | V1 | 骨架与视觉方向（胡桃木 × 橡木 × 黄铜拟物化） |
 | V2 | 视觉打磨：质感升级、柔和提亮、洞窟探索光效、引子 |
 | V3 | 反馈功能（前端表单 + 后台控制台）+ 公开发布 |
+| V4 | 依据访客反馈迭代：表单补「身份关系 + 反馈设备」字段，按课程工作流做决策与验证 |
 
 ## 目录结构
 
 ```
 index.html          V1 正式版
-v2-preview.html     V2/V3 预览版（含洞窟光效、引子、反馈表单）
+v2-preview.html     V2/V3/V4 主入口（洞窟光效、引子、反馈表单）
 admin.html          反馈后台（仅本人使用，已设 noindex）
 css/                样式（styles.css = V1，styles-v2.css / styles-v3.css = 覆盖层）
-js/                 脚本（main.js = V1；其余为 V2/V3 模块）
+js/                 脚本（main.js = V1；config/cave-*/feedback-* 为 V2–V4 模块）
 assets/             贴图与图片
-supabase-setup.sql  反馈表建表与 RLS 策略脚本
+supabase-setup.sql  反馈表建表 + RLS 策略 + V4 加列迁移脚本
 ```
 
 ## 反馈功能说明
@@ -44,6 +45,8 @@ supabase-setup.sql  反馈表建表与 RLS 策略脚本
 
 ## 本地预览
 
+在**本仓库根目录**（即 `…\personal-homepage\CHEN Yinzhang\personal-homepage`）执行：
+
 ```bash
 python -m http.server 8124 --bind 127.0.0.1
 ```
@@ -53,3 +56,5 @@ python -m http.server 8124 --bind 127.0.0.1
 ## 记录
 
 开发全过程记录见 `WORKLOG.md`。
+
+> 本项目自 2026-09-30 起迁移至课程目录 `TJU：Project-Based CST & AI Foundations\personal-homepage\CHEN Yinzhang\personal-homepage`；GitHub 远端与公开发布不受本机路径影响。
