@@ -476,7 +476,7 @@ V2 期间曾有两条并行推进的工作线，本节起按时间归并编号�
 ### 步骤 2：反馈表单补「身份关系 + 反馈设备」字段（2026-09-25）
 
 - **依据**：09-17 课转写中老师对反馈表单字段的逐条要求——①昵称 ②与你的关系（角色视角）③**针对本条反馈**用的设备（不是泛问「你用什么设备」，因为存在「电脑上发现问题、用手机提交」的错位）④反馈内容给引导性 placeholder，不问手机号、不要求登录。
-- **改动**（7 个文件，commit `a5c3f098`）：
+- **改动**（7 个文件，commit `b85dc76`）：
   - `v2-preview.html`：表单新增两个选填下拉——「你和我的关系」（同学/学长学姐/家人/在职人士/HR或招聘/老师/其他）与「发现问题的设备」（手机/平板/笔记本/台式机/不涉及）；
   - `js/feedback-ui.js`：采集两个新字段（`fbRelation`/`fbDevice`），提交成功提示在降级时追加说明；
   - `js/feedback-store.js`：条目结构与云端 POST 增加 `relation`/`device`，并新增**降级兼容**——后台表未加列时（PostgREST 返回 400 PGRST204）自动去掉新字段重试一次并标记 `degraded`，保证表单永远可用；
@@ -489,3 +489,13 @@ V2 期间曾有两条并行推进的工作线，本节起按时间归并编号�
   - Supabase 携带新字段 POST → **400 PGRST204**（列不存在，符合预期）；不带新字段 POST → **201**（降级路径成立）✓；
   - 代码路径核对：fallback 触发条件（PGRST204 / Could not find the）✓、重试载荷不含新字段 ✓、`degraded` 标记透传 UI ✓；
   - 结论：**数据库未升级前表单照常可用（仅两新项暂不收集）；执行迁移后自动收集全字段**。
+
+---
+
+## 项目迁移（2026-09-30）
+
+- **迁移**：整个 git 仓库自 `C:\Users\LegacYinJadeware\DeepWorks\personal-homepage` 迁至课程目录 `…\TJU：Project-Based CST & AI Foundations\personal-homepage\CHEN Yinzhang\personal-homepage`（同盘 `mv`，零拷贝损耗）。
+- **完整性验证**：HEAD `b85dc76`、25 个跟踪文件、对象数 222、分支 `main`、remote 均与迁移前一致；`git fsck` 无异常；新位置本地服务冒烟测试 HTTP 200；旧位置无残留、无重复副本。
+- **不受影响**：GitHub 远端（dxhangsh/personal-homepage）与公网 Pages（https://dxhangsh.github.io/personal-homepage/）仅依赖 git 内容，与本机路径无关。
+- **关联文档**：`V4-收尾与查漏补缺方案.md`、`V4-反馈采集设计与模拟反馈.md` 与本站同置于上级 `CHEN Yinzhang\` 目录；课程级素材（`Transcripts_CapsWriter\`、音频、课件原件）留在课程根目录未动。
+- **基准日期校正**：本文件及 V4 方案中的进度描述统一按 2026-09-30 核对；V4 表单字段改动已由 commit `b85dc76` 完成（早前会话中曾记录的 `a5c3f098` 为失效 SHA，其内容已并入 `b85dc76`）。
